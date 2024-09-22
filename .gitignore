@@ -1,0 +1,21 @@
+# React Native (frontend)
+frontend/node_modules/
+frontend/ios/Pods/
+frontend/*.log
+frontend/*.lock
+frontend/*.xcworkspace
+frontend/build/
+frontend/*.iml
+
+# Node.js (backend)
+backend/node_modules/
+backend/npm-debug.log*
+backend/yarn-debug.log*
+backend/yarn-error.log*
+backend/.env
+backend/dist/
+
+# General OS and IDE files
+.DS_Store
+.idea/
+.vscode/
