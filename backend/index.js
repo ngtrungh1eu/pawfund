@@ -12,12 +12,10 @@ const shelterRoutes = require('./routes/shelterRoutes');
 const adoptionRoutes = require('./routes/adoptionsRoute');
 const donationRoutes = require('./routes/donationsRoute');
 const eventRoutes = require('./routes/eventsRoute');
+
 const { connect } = require('./config/database');
 
 const app = express();
-
-app.use(cors());
-app.use(express.json());
 
 // Config
 dotenv.config();
@@ -33,8 +31,9 @@ app.use(express.urlencoded({ extended: true }));
 // Http logger
 app.use(morgan('combined'));
 
-// Kết nối database
+// Connect database
 connect();
+
 // Routes
 app.use('/api/users', userRoutes);
 app.use('/api/pets', petRoutes);
@@ -43,6 +42,7 @@ app.use('/api/adoptions', adoptionRoutes);
 app.use('/api/donations', donationRoutes);
 app.use('/api/events', eventRoutes);
 
+// Start server
 app.listen(process.env.PORT, () => {
   console.log(`Server running on port http://localhost:${process.env.PORT}`);
 });
