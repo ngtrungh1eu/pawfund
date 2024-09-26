@@ -6,7 +6,7 @@ const methodOverride = require('method-override');
 const cookieParser = require('cookie-parser');
 const morgan = require('morgan');
 
-const userRoutes = require('./routes/authRoute');
+const authRoutes = require('./routes/authRoute');
 const petRoutes = require('./routes/petsRoute');
 const shelterRoutes = require('./routes/shelterRoutes');
 const adoptionRoutes = require('./routes/adoptionsRoute');
@@ -14,7 +14,6 @@ const donationRoutes = require('./routes/donationsRoute');
 const eventRoutes = require('./routes/eventsRoute');
 
 const { connect } = require('./config/database');
-
 const app = express();
 
 // Config
@@ -35,7 +34,7 @@ app.use(morgan('combined'));
 connect();
 
 // Routes
-app.use('/api/users', userRoutes);
+app.use('/api/auth', authRoutes);
 app.use('/api/pets', petRoutes);
 app.use('/api/shelters', shelterRoutes);
 app.use('/api/adoptions', adoptionRoutes);
