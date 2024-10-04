@@ -2,7 +2,7 @@ import { StyleSheet, Text, View } from "react-native";
 
 import React from "react";
 
-const HomeScreen = () => {
+const OnboardingScreens = () => {
   return (
     <View style={styles.container}>
       <Text>Welcome to PawFund!</Text>
@@ -18,4 +18,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default HomeScreen;
+export default OnboardingScreens;

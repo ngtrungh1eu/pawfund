@@ -22,6 +22,17 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "jsEngine": "hermes",
+    "extra": {
+      "eas": {
+        "projectId": "your-project-id"
+      }
+    },
+    "packagerOpts": {
+      "extraNodeModules": {
+        "axios": "node_modules/axios"
+      }
     }
   }
 }
