@@ -47,6 +47,7 @@ export default function LoginScreen() {
   };
 
   const handleLogin = () => {
+    navigation.navigate("SystemSettings" as never);
     // Validate inputs before proceeding
     validateEmail(email);
     validatePassword(password);

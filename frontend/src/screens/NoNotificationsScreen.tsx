@@ -6,7 +6,7 @@ const NoNotifications: React.FC = () => {
   return (
     <View style={styles.container}>
       <Image
-        source={require("../assets/no-notifications.png")}
+        source={require("../assets/no-notification.png")}
         style={styles.image}
       />
       <Text style={styles.title}>No Notifications</Text>
@@ -26,18 +26,19 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   image: {
-    width: 200,
-    height: 200,
+    width: 84,
+    height: 84,
     marginBottom: 20,
   },
   title: {
-    fontSize: 24,
-    fontWeight: "bold",
+    fontSize: 14,
+    fontWeight: "500",
     marginBottom: 10,
     color: "#333",
   },
   subtitle: {
-    fontSize: 16,
+    fontSize: 12,
+    fontWeight: "400",
     textAlign: "center",
     color: "#666",
   },

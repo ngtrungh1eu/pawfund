@@ -1,10 +1,12 @@
 import HomeScreen from "../screens/HomeScreen";
 import LoginScreen from "../screens/LoginScreen";
 import { NavigationContainer } from "@react-navigation/native";
+import NoNotifications from "../screens/NoNotificationsScreen";
 import OnboardingScreens from "../screens/OnboardingScreens";
 import ProfileSetupComplete from "../screens/ProfileSetupComplete";
 import React from "react";
 import SplashScreen from "../screens/SplashScreen";
+import SystemSettingsScreen from "../screens/SystemSettingsScreen";
 import { createStackNavigator } from "@react-navigation/stack";
 import useAuth from "../hooks/useAuth";
 
@@ -38,6 +40,15 @@ const AppNavigator = () => {
               name="ProfileSetupComplete"
               component={ProfileSetupComplete}
               options={{ headerShown: false }}
+            />
+            <Stack.Screen
+              name="NoNotifications"
+              component={NoNotifications}
+              options={{ headerShown: false }}
+            />
+            <Stack.Screen
+              name="SystemSettings"
+              component={SystemSettingsScreen}
             />
           </>
         )}

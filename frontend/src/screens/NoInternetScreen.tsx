@@ -1,6 +1,5 @@
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
-import { Ionicons } from "@expo/vector-icons";
 import React from "react";
 
 interface NoInternetProps {
@@ -10,16 +9,18 @@ interface NoInternetProps {
 const NoInternet: React.FC<NoInternetProps> = ({ onRetry }) => {
   return (
     <View style={styles.container}>
-      <Image
-        source={require("../assets/no-internet.png")}
-        style={styles.image}
-      />
-      <Text style={styles.title}>No Internet Connection</Text>
-      <Text style={styles.subtitle}>
-        Please check your internet connection and try again.
-      </Text>
+      <View style={styles.contentContainer}>
+        <Image
+          source={require("../assets/no-internet.png")}
+          style={styles.image}
+        />
+        <Text style={styles.title}>No Internet Connection Found!</Text>
+        <Text style={styles.subtitle}>
+          Unable to connect to the internet. Please check your connection and
+          try again.
+        </Text>
+      </View>
       <TouchableOpacity style={styles.retryButton} onPress={onRetry}>
-        <Ionicons name="refresh" size={24} color="white" />
         <Text style={styles.retryText}>Retry</Text>
       </TouchableOpacity>
     </View>
@@ -29,10 +30,14 @@ const NoInternet: React.FC<NoInternetProps> = ({ onRetry }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: "space-between",
     backgroundColor: "#f5f5f5",
     padding: 20,
+  },
+  contentContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
   },
   image: {
     width: 200,
@@ -40,13 +45,14 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   title: {
-    fontSize: 24,
-    fontWeight: "bold",
+    fontSize: 14,
+    fontWeight: "500",
     marginBottom: 10,
     color: "#333",
   },
   subtitle: {
-    fontSize: 16,
+    fontSize: 12,
+    fontWeight: "400",
     textAlign: "center",
     marginBottom: 20,
     color: "#666",
@@ -54,10 +60,12 @@ const styles = StyleSheet.create({
   retryButton: {
     flexDirection: "row",
     alignItems: "center",
+    justifyContent: "center",
     backgroundColor: "#16A99F",
     paddingHorizontal: 20,
-    paddingVertical: 10,
+    paddingVertical: 14,
     borderRadius: 5,
+    marginTop: 20,
   },
   retryText: {
     color: "white",
