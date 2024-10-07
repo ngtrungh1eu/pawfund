@@ -1,4 +1,3 @@
-import React, { useState } from "react";
 import {
   Alert,
   Image,
@@ -11,6 +10,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import React, { useState } from "react";
 
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
@@ -70,7 +70,7 @@ export default function LoginScreen() {
   };
 
   const handleSignUp = () => {
-    navigation.navigate("Onboarding");
+    navigation.navigate("Onboarding" as never);
   };
 
   return (
@@ -108,7 +108,7 @@ export default function LoginScreen() {
             <Text style={styles.errorText}>{emailError}</Text>
           ) : null}
 
-          <Text style={styles.label}>Password</Text>
+          <Text style={[styles.label, { marginTop: 15 }]}>Password</Text>
           <View
             style={[
               styles.inputWrapper,
@@ -167,7 +167,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginTop: -174,
     marginBottom: 23,
-    marginHorizontal: -76,
+    alignSelf: "center",
     width: 545,
     height: 545,
     borderRadius: 999999999,
@@ -184,19 +184,20 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   label: {
-    fontSize: 16,
+    fontSize: 14,
+    fontWeight: "500",
     marginBottom: 8,
     color: "#333",
   },
   inputWrapper: {
     flexDirection: "row",
     alignItems: "center",
-    height: 50,
-    borderColor: "#ccc",
+    height: 42,
+    borderColor: "#848484",
     borderWidth: 1,
     borderRadius: 5,
-    marginBottom: 5,
-    paddingHorizontal: 10,
+    marginBottom: 8,
+    paddingHorizontal: 12,
   },
   input: {
     flex: 1,
@@ -213,12 +214,16 @@ const styles = StyleSheet.create({
   errorText: {
     color: "#BE1447",
     marginBottom: 10,
+    fontSize: 12,
+    fontWeight: "400",
   },
   forgotPassword: {
-    color: "#333",
+    color: "#000000",
     textAlign: "right",
     marginTop: 15,
     marginBottom: 20,
+    fontSize: 14,
+    fontWeight: "400",
   },
   bottomContainer: {
     paddingHorizontal: 20,
