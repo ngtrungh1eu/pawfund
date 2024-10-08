@@ -1,15 +1,22 @@
-import React, { useEffect } from "react";
 import { Image, StyleSheet, View } from "react-native";
+import React, { useEffect } from "react";
 
+import useAuth from "../hooks/useAuth";
 import { useNavigation } from "@react-navigation/native";
 
 const SplashScreen = () => {
   const navigation = useNavigation();
+  const { isAuthenticated } = useAuth();
 
   useEffect(() => {
     const timer = setTimeout(() => {
       // Navigate to the main app after a delay
-      navigation.replace("Login");
+      if (isAuthenticated) {
+        navigation.navigate("Home" as never);
+        return;
+      } else {
+        navigation.navigate("Login" as never);
+      }
     }, 2000); // Adjust the delay as needed (2 seconds in this example)
 
     return () => clearTimeout(timer);
