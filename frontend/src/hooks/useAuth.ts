@@ -9,7 +9,7 @@ const useAuth = () => {
   // return context;
   return {
     ...context,
-    isAuthenticated: false,
+    isAuthenticated: true,
   };
 };
 

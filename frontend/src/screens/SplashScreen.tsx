@@ -12,7 +12,7 @@ const SplashScreen = () => {
     const timer = setTimeout(() => {
       // Navigate to the main app after a delay
       if (isAuthenticated) {
-        navigation.navigate("Home" as never);
+        navigation.navigate("Main" as never);
         return;
       } else {
         navigation.navigate("Login" as never);

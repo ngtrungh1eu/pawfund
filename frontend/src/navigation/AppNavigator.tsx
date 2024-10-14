@@ -3,8 +3,8 @@ import AppTheme from "../screens/AppThemeScreen";
 import DonatedHistory from "../screens/DonatedHistoryScreen";
 import DonatedTransactionDetails from "../screens/DonatedTransactionDetailsScreen";
 import ForgotPasswordScreen from "../screens/ForgotPasswordScreen";
-import HomeScreen from "../screens/HomeScreen";
-import LoginScreen from "../screens/LoginScreen";
+import { HomeScreen } from "../screens/HomeScreen";
+import LoginScreen from "../screens/LoginScreen";  
 import { NavigationContainer } from "@react-navigation/native";
 import NoChat from "../screens/NoChatScreen";
 import NoNotifications from "../screens/NoNotificationsScreen";
@@ -22,6 +22,12 @@ import UPISetting from "../screens/UPISettingScreen";
 import VerifyUPISetting from "../screens/VerifyUPISettingScreen";
 import { createStackNavigator } from "@react-navigation/stack";
 import useAuth from "../hooks/useAuth";
+import { TabNavigator } from "./TabNavigator";
+import LostFoundScreen from "../screens/LostFoundScreen";
+import { AdoptPetScreen } from "../screens/AdoptPetScreen";
+import LostFoundForm from "../screens/LostFoundForm";
+import { PetDetailScreen } from "../screens/PetDetailScreen";
+
 
 const Stack = createStackNavigator();
 
@@ -37,7 +43,16 @@ const AppNavigator = () => {
         />
         {isAuthenticated ? (
           <>
-            <Stack.Screen name="Home" component={HomeScreen} />
+            <Stack.Screen name="Home" component={HomeScreen} options={{ headerShown: true }} />
+            <Stack.Screen name="Main" component={TabNavigator} options={{ headerShown: false }} />
+      <Stack.Screen name="Lost and Found" component={LostFoundScreen} options={{ headerShown: true }} />
+      <Stack.Screen name="Adopt a pet" component={AdoptPetScreen} options={{ headerShown: true }} />
+      <Stack.Screen name="FoundandLostForm" component={LostFoundForm} options={{ headerShown: true }} />
+      <Stack.Screen 
+          name="PetDetailScreen" 
+          component={PetDetailScreen} 
+          options={{ headerShown: true }}
+        />
             <Stack.Screen
               name="DonatedHistory"
               component={DonatedHistory}
