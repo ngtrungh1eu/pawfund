@@ -63,7 +63,7 @@ export function TabNavigator() {
               </Text>
             </View>
           ),
-          tabBarLabel: () => null, // Hide the label for the SOS button
+          tabBarLabel: () => null, 
         }}
       />
 
