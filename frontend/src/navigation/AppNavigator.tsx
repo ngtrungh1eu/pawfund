@@ -1,3 +1,6 @@
+import { NavigationContainer } from "@react-navigation/native";
+import { createStackNavigator } from "@react-navigation/stack";
+
 import AddUPISetting from "../screens/AddUPISettingScreen";
 import AppTheme from "../screens/AppThemeScreen";
 import DonatedHistory from "../screens/DonatedHistoryScreen";
@@ -5,7 +8,6 @@ import DonatedTransactionDetails from "../screens/DonatedTransactionDetailsScree
 import ForgotPasswordScreen from "../screens/ForgotPasswordScreen";
 import HomeScreen from "../screens/HomeScreen";
 import LoginScreen from "../screens/LoginScreen";
-import { NavigationContainer } from "@react-navigation/native";
 import NoChat from "../screens/NoChatScreen";
 import NoNotifications from "../screens/NoNotificationsScreen";
 import Notifications from "../screens/NotificationsScreen";
@@ -20,7 +22,6 @@ import SplashScreen from "../screens/SplashScreen";
 import SystemSettingsScreen from "../screens/SystemSettingsScreen";
 import UPISetting from "../screens/UPISettingScreen";
 import VerifyUPISetting from "../screens/VerifyUPISettingScreen";
-import { createStackNavigator } from "@react-navigation/stack";
 import useAuth from "../hooks/useAuth";
 
 const Stack = createStackNavigator();
