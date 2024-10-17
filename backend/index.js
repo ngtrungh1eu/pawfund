@@ -19,7 +19,14 @@ const app = express();
 // Config
 dotenv.config();
 app.use(express.static(path.join(__dirname, 'public')));
-app.use(cors());
+
+// const corsOptions = {
+//     origin: ['http://localhost:3000', 'http://yourdomain.com'],
+//     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+//     credentials: true,
+//     optionsSuccessStatus: 204,
+// };
+// app.use(cors());
 app.use(methodOverride('_method'));
 app.use(cookieParser());
 
@@ -43,5 +50,5 @@ app.use('/api/events', eventRoutes);
 
 // Start server
 app.listen(process.env.PORT, () => {
-  console.log(`Server running on port http://localhost:${process.env.PORT}`);
+    console.log(`Server running on port http://localhost:${process.env.PORT}`);
 });
