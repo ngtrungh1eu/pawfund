@@ -83,9 +83,13 @@ exports.login = async (req, res) => {
         user.refreshToken = refreshToken;
         await user.save();
 
-        res.json({ accessToken, refreshToken });
+        res.status(200).json({
+            success: true,
+            accessToken: accessToken,
+            refreshToken: refreshToken,
+        });
     } catch (error) {
-        console.error('Login error:', error);
+        console.error('Login error:', error.message);
         res.status(500).json({
             message: 'Error logging in',
             error: error.message,
