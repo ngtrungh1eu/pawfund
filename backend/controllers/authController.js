@@ -8,8 +8,8 @@ const generateRefreshToken = () => {
 };
 
 // Hàm tạo accessToken
-const generateAccessToken = (userId, role) => {
-    return jwt.sign({ userId, role }, process.env.JWT_ACCESS_TOKEN, {
+const generateAccessToken = (userId, role, username) => {
+    return jwt.sign({ userId, role, username }, process.env.JWT_ACCESS_TOKEN, {
         expiresIn: '1h',
     });
 };
@@ -76,16 +76,24 @@ exports.login = async (req, res) => {
             return res.status(401).json({ message: 'Invalid credentials' });
         }
 
-        const accessToken = generateAccessToken(user._id, user.role);
+        const accessToken = generateAccessToken(
+            user._id,
+            user.role,
+            user.username
+        );
         const refreshToken = generateRefreshToken();
 
         // Lưu refreshToken vào database
         user.refreshToken = refreshToken;
         await user.save();
 
-        res.json({ accessToken, refreshToken });
+        res.status(200).json({
+            success: true,
+            accessToken: accessToken,
+            refreshToken: refreshToken,
+        });
     } catch (error) {
-        console.error('Login error:', error);
+        console.error('Login error:', error.message);
         res.status(500).json({
             message: 'Error logging in',
             error: error.message,

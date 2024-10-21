@@ -26,7 +26,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 //     credentials: true,
 //     optionsSuccessStatus: 204,
 // };
-// app.use(cors());
+app.use(cors());
 app.use(methodOverride('_method'));
 app.use(cookieParser());
 
