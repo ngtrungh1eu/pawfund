@@ -24,7 +24,7 @@ export default function App() {
     const login = async (username: string, password: string) => {
         try {
             const response = await axios.post(
-                'http://10.0.2.2:8888/api/auth/login',
+                'https://14cc-2001-ee0-4f0d-a850-209f-3c4f-a198-c4d6.ngrok-free.app/api/auth/login',
                 {
                     username,
                     password,
@@ -42,7 +42,6 @@ export default function App() {
                 await AsyncStorage.setItem('username', decoded.username);
 
                 setIsAuthenticated(true);
-                return decoded;
             } else {
                 setIsAuthenticated(false);
                 Alert.alert('Login Error', 'Invalid credentials');
@@ -56,7 +55,10 @@ export default function App() {
 
     const logout = async () => {
         try {
-            await axios.post('http://10.0.2.2:8888/api/auth/logout', {});
+            await axios.post(
+                'https://14cc-2001-ee0-4f0d-a850-209f-3c4f-a198-c4d6.ngrok-free.app/api/auth/logout',
+                {}
+            );
             AsyncStorage.clear();
             setIsAuthenticated(false);
             Alert.alert('Logged out', 'You have successfully logged out.');
