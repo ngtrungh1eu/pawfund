@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {
     View,
     Text,
@@ -11,16 +11,49 @@ import {
 import { FontAwesome, Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import useAuth from '../hooks/useAuth';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios';
+type UserProfile = {
+    _id: string;
+    username: string;
+    email: string;
+    avatar?: string; // Optional if the avatar might not always be present
+    // Add other properties as needed
+};
 
 export function ProfileScreen() {
     const navigation = useNavigation();
     const { logout } = useAuth();
+    const [user, setUser] = useState<UserProfile | null>(null);
+    useEffect(() => {
+        const fetchProfile = async () => {
+            try {
+                const token = await AsyncStorage.getItem('access_token');
+                const response = await axios.get(
+                    'https://14cc-2001-ee0-4f0d-a850-209f-3c4f-a198-c4d6.ngrok-free.app/api/auth/profile',
+                    {
+                        headers: {
+                            Authorization: `Bearer ${token}`,
+                        },
+                    }
+                );
+                setUser(response.data);
+            } catch (error) {
+                console.error('Error fetching profile:', error);
+                Alert.alert('Error', 'Failed to fetch profile data');
+            }
+        };
+
+        fetchProfile();
+    }, []);
     // Handle Log Out action
     const handleLogout = async () => {
         await logout(); // Gọi hàm logout từ context
         navigation.navigate('Login' as never); // Điều hướng đến màn hình đăng nhập
     };
-
+    if (!user) {
+        return <Text>Loading...</Text>;
+    }
     return (
         <ScrollView
             style={styles.scrollView}
@@ -34,8 +67,8 @@ export function ProfileScreen() {
                     }}
                     style={styles.avatar}
                 />
-                <Text style={styles.fullName}>John Doe</Text>
-                <Text style={styles.email}>john.doe@example.com</Text>
+                <Text style={styles.fullName}>{user.username}</Text>
+                <Text style={styles.email}>{user.email}</Text>
             </View>
 
             {/* Donated and Adopted Cards */}
