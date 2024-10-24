@@ -14,6 +14,29 @@ import { FontAwesome } from "@expo/vector-icons";
 import { NavigationProp, useNavigation } from "@react-navigation/native";
 
 export function HomeScreen() {
+  
+
+import React, { useState, useEffect } from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  TextInput,
+  TouchableOpacity,
+  FlatList,
+  ScrollView,
+  ActivityIndicator,
+} from "react-native";
+import { PetCard } from "../components/PetCard";
+import { FontAwesome } from "@expo/vector-icons";
+import { NavigationProp, useNavigation } from "@react-navigation/native";
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { jwtDecode } from 'jwt-decode';
+interface DecodedToken {
+    username: string;
+}
+export function HomeScreen() {
+  
   const navigation = useNavigation();
   const [showAllPets, setShowAllPets] = useState(false);
   const [selectedType, setSelectedType] = useState<
@@ -36,15 +59,33 @@ export function HomeScreen() {
     };
     fetchPets();
   }, []);
+    const [username, setUsername] = useState<string | null>(null);
+    useEffect(() => {
+        const fetchUsername = async () => {
+            try {
+                const savedUsername = await AsyncStorage.getItem('username');
+                if (savedUsername) {
+                    setUsername(savedUsername);
+                }
+            } catch (error) {
+                console.error(
+                    'Error fetching username from AsyncStorage:',
+                    error
+                );
+            }
+        };
 
-  const petsToShow = showAllPets ? pets : pets.slice(0, 6);
+        fetchUsername();
+    }, []);
+    
 
-  const ListHeader = () => (
-    <View>
-      <View style={styles.header}>
+    const petsToShow = showAllPets ? pets : pets.slice(0, 6);
+
+    const ListHeader = () => (
         <View>
-          <Text style={styles.heading1}>Hello dan666q!</Text>
-          <Text style={styles.heading}>Ready to Rescue?</Text>
+ <Text style={styles.heading1}>
+                        {username ? `Hello ${username}!` : 'Hello!'}
+                    </Text>          <Text style={styles.heading}>Ready to Rescue?</Text>
         </View>
         <View style={styles.bellIconContainer}>
           <FontAwesome name="bell" size={24} color="#16A99F" />
@@ -148,18 +189,19 @@ export function HomeScreen() {
       )}
     </View>
   );
+                  
 
-  return (
-    <ScrollView style={styles.container}>
-      <FlatList
-        data={[]}
-        renderItem={null}
-        ListHeaderComponent={ListHeader}
-        ListFooterComponent={ListFooter}
-        scrollEnabled={false}
-      />
-    </ScrollView>
-  );
+    return (
+        <ScrollView style={styles.container}>
+            <FlatList
+                data={[]}
+                renderItem={null}
+                ListHeaderComponent={ListHeader}
+                ListFooterComponent={ListFooter}
+                scrollEnabled={false}
+            />
+        </ScrollView>
+    );
 }
 
 const styles = StyleSheet.create({
@@ -262,4 +304,5 @@ const styles = StyleSheet.create({
     fontSize: 20,
     marginBottom: 6,
   },
+
 });
