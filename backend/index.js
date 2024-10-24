@@ -47,9 +47,6 @@ app.use('/api/shelters', shelterRoutes);
 app.use('/api/adoptions', adoptionRoutes);
 app.use('/api/donations', donationRoutes);
 app.use('/api/events', eventRoutes);
-app.get('/', (req, res) => {
-    res.send('Welcome to the API! Use the /api/ endpoints.');
-});
 
 // Start server
 app.listen(process.env.PORT, () => {
