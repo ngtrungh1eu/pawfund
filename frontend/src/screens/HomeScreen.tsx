@@ -12,36 +12,15 @@ import {
 import { PetCard } from "../components/PetCard";
 import { FontAwesome } from "@expo/vector-icons";
 import { NavigationProp, useNavigation } from "@react-navigation/native";
-
-export function HomeScreen() {
-  
-
-import React, { useState, useEffect } from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  TextInput,
-  TouchableOpacity,
-  FlatList,
-  ScrollView,
-  ActivityIndicator,
-} from "react-native";
-import { PetCard } from "../components/PetCard";
-import { FontAwesome } from "@expo/vector-icons";
-import { NavigationProp, useNavigation } from "@react-navigation/native";
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { jwtDecode } from 'jwt-decode';
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { jwtDecode } from "jwt-decode";
 interface DecodedToken {
-    username: string;
+  username: string;
 }
 export function HomeScreen() {
-  
   const navigation = useNavigation();
   const [showAllPets, setShowAllPets] = useState(false);
-  const [selectedType, setSelectedType] = useState<
-    "All" | "Dog" | "Cat" | "Bird" | "Others"
-  >("All");
+  const [selectedType, setSelectedType] = useState<"All" | "Dog" | "Cat" | "Bird" | "Others">("All");
   const [pets, setPets] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -59,33 +38,30 @@ export function HomeScreen() {
     };
     fetchPets();
   }, []);
-    const [username, setUsername] = useState<string | null>(null);
-    useEffect(() => {
-        const fetchUsername = async () => {
-            try {
-                const savedUsername = await AsyncStorage.getItem('username');
-                if (savedUsername) {
-                    setUsername(savedUsername);
-                }
-            } catch (error) {
-                console.error(
-                    'Error fetching username from AsyncStorage:',
-                    error
-                );
-            }
-        };
+  const [username, setUsername] = useState<string | null>(null);
+  useEffect(() => {
+    const fetchUsername = async () => {
+      try {
+        const savedUsername = await AsyncStorage.getItem("username");
+        if (savedUsername) {
+          setUsername(savedUsername);
+        }
+      } catch (error) {
+        console.error("Error fetching username from AsyncStorage:", error);
+      }
+    };
 
-        fetchUsername();
-    }, []);
-    
+    fetchUsername();
+  }, []);
 
-    const petsToShow = showAllPets ? pets : pets.slice(0, 6);
+  const petsToShow = showAllPets ? pets : pets.slice(0, 6);
 
-    const ListHeader = () => (
+  const ListHeader = () => (
+    <View>
+      <View>
         <View>
- <Text style={styles.heading1}>
-                        {username ? `Hello ${username}!` : 'Hello!'}
-                    </Text>          <Text style={styles.heading}>Ready to Rescue?</Text>
+          <Text style={styles.heading1}>{username ? `Hello ${username}!` : "Hello!"}</Text>
+          <Text style={styles.heading}>Ready to Rescue?</Text>
         </View>
         <View style={styles.bellIconContainer}>
           <FontAwesome name="bell" size={24} color="#16A99F" />
@@ -94,70 +70,37 @@ export function HomeScreen() {
 
       <View style={styles.searchBar}>
         <FontAwesome name="search" size={20} color="gray" />
-        <TextInput
-          style={styles.searchInput}
-          placeholder="Search nearest pet"
-        />
+        <TextInput style={styles.searchInput} placeholder="Search nearest pet" />
         <FontAwesome name="filter" size={20} color="gray" />
       </View>
 
       {/* Two cards in a row */}
       <View style={styles.row}>
-        <TouchableOpacity
-          style={styles.card}
-          onPress={() => navigation.navigate("Adopt a pet")}
-        >
+        <TouchableOpacity style={styles.card} onPress={() => navigation.navigate("Adopt a pet")}>
           <View>
-            <FontAwesome
-              name="paw"
-              size={24}
-              color="#fff"
-              style={styles.iconSquare}
-            />
+            <FontAwesome name="paw" size={24} color="#fff" style={styles.iconSquare} />
           </View>
           <Text style={styles.cardTitle}>Adopt a Pet</Text>
-          <Text style={styles.cardDescription}>
-            Browse animals available for adoption.
-          </Text>
+          <Text style={styles.cardDescription}>Browse animals available for adoption.</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity
-          style={styles.card}
-          onPress={() => navigation.navigate("Lost and Found")}
-        >
+        <TouchableOpacity style={styles.card} onPress={() => navigation.navigate("Lost and Found")}>
           <View>
-            <FontAwesome
-              name="search"
-              size={24}
-              color="#fff"
-              style={styles.iconSquare}
-            />
+            <FontAwesome name="search" size={24} color="#fff" style={styles.iconSquare} />
           </View>
           <Text style={styles.cardTitle}>Lost & Found</Text>
-          <Text style={styles.cardDescription}>
-            Report a lost pet or a found animal.
-          </Text>
+          <Text style={styles.cardDescription}>Report a lost pet or a found animal.</Text>
         </TouchableOpacity>
       </View>
 
-      <TouchableOpacity
-        style={styles.fullWidthCard}
-        onPress={() => navigation.navigate("LostFoundScreen")}
-      >
+      <TouchableOpacity style={styles.fullWidthCard} onPress={() => navigation.navigate("LostFoundScreen")}>
         <View style={styles.cardContent}>
           <View style={styles.iconContainer}>
-            <FontAwesome
-              name="list-alt"
-              size={24}
-              color="#fff"
-              style={styles.iconSquare}
-            />
+            <FontAwesome name="list-alt" size={24} color="#fff" style={styles.iconSquare} />
           </View>
           <View style={styles.textContainer}>
             <Text style={styles.cardTitle}>Feeds</Text>
-            <Text style={styles.cardDesfeeds}>
-              Stay Updated: Your Source for the Latest feeds and Updates.
-            </Text>
+            <Text style={styles.cardDesfeeds}>Stay Updated: Your Source for the Latest feeds and Updates.</Text>
           </View>
         </View>
       </TouchableOpacity>
@@ -175,13 +118,7 @@ export function HomeScreen() {
             style={{ marginBottom: 60 }}
             horizontal
             data={petsToShow}
-            renderItem={({ item }) => (
-              <PetCard
-                name={item.name}
-                breed={item.breed}
-                image={item.images[0]}
-              />
-            )}
+            renderItem={({ item }) => <PetCard name={item.name} breed={item.breed} image={item.images[0]} />}
             keyExtractor={(item) => item._id}
             showsHorizontalScrollIndicator={false}
           />
@@ -189,19 +126,18 @@ export function HomeScreen() {
       )}
     </View>
   );
-                  
 
-    return (
-        <ScrollView style={styles.container}>
-            <FlatList
-                data={[]}
-                renderItem={null}
-                ListHeaderComponent={ListHeader}
-                ListFooterComponent={ListFooter}
-                scrollEnabled={false}
-            />
-        </ScrollView>
-    );
+  return (
+    <ScrollView style={styles.container}>
+      <FlatList
+        data={[]}
+        renderItem={null}
+        ListHeaderComponent={ListHeader}
+        ListFooterComponent={ListFooter}
+        scrollEnabled={false}
+      />
+    </ScrollView>
+  );
 }
 
 const styles = StyleSheet.create({
@@ -304,5 +240,4 @@ const styles = StyleSheet.create({
     fontSize: 20,
     marginBottom: 6,
   },
-
 });
