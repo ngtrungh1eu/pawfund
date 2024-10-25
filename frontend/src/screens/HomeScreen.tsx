@@ -13,16 +13,13 @@ import { PetCard } from "../components/PetCard";
 import { FontAwesome } from "@expo/vector-icons";
 import { NavigationProp, useNavigation } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { jwtDecode } from "jwt-decode";
-interface DecodedToken {
-  username: string;
-}
+
 export function HomeScreen() {
-  const navigation = useNavigation();
+  const navigation = useNavigation<NavigationProp<any>>();
   const [showAllPets, setShowAllPets] = useState(false);
-  const [selectedType, setSelectedType] = useState<"All" | "Dog" | "Cat" | "Bird" | "Others">("All");
   const [pets, setPets] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [username, setUsername] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchPets = async () => {
@@ -38,7 +35,7 @@ export function HomeScreen() {
     };
     fetchPets();
   }, []);
-  const [username, setUsername] = useState<string | null>(null);
+
   useEffect(() => {
     const fetchUsername = async () => {
       try {
@@ -59,48 +56,77 @@ export function HomeScreen() {
   const ListHeader = () => (
     <View>
       <View>
-        <View>
-          <Text style={styles.heading1}>{username ? `Hello ${username}!` : "Hello!"}</Text>
-          <Text style={styles.heading}>Ready to Rescue?</Text>
-        </View>
-        <View style={styles.bellIconContainer}>
-          <FontAwesome name="bell" size={24} color="#16A99F" />
-        </View>
+        <Text style={styles.heading1}>
+          {username ? `Hello ${username}!` : "Hello!"}
+        </Text>
+        <Text style={styles.heading}>Ready to Rescue?</Text>
       </View>
-
+      <View style={styles.bellIconContainer}>
+        <FontAwesome name="bell" size={24} color="#16A99F" />
+      </View>
       <View style={styles.searchBar}>
         <FontAwesome name="search" size={20} color="gray" />
-        <TextInput style={styles.searchInput} placeholder="Search nearest pet" />
+        <TextInput
+          style={styles.searchInput}
+          placeholder="Search nearest pet"
+        />
         <FontAwesome name="filter" size={20} color="gray" />
       </View>
-
-      {/* Two cards in a row */}
       <View style={styles.row}>
-        <TouchableOpacity style={styles.card} onPress={() => navigation.navigate("Adopt a pet")}>
+        <TouchableOpacity
+          style={styles.card}
+          onPress={() => navigation.navigate("Adopt a pet")}
+        >
           <View>
-            <FontAwesome name="paw" size={24} color="#fff" style={styles.iconSquare} />
+            <FontAwesome
+              name="paw"
+              size={24}
+              color="#fff"
+              style={styles.iconSquare}
+            />
           </View>
           <Text style={styles.cardTitle}>Adopt a Pet</Text>
-          <Text style={styles.cardDescription}>Browse animals available for adoption.</Text>
+          <Text style={styles.cardDescription}>
+            Browse animals available for adoption.
+          </Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.card} onPress={() => navigation.navigate("Lost and Found")}>
+        <TouchableOpacity
+          style={styles.card}
+          onPress={() => navigation.navigate("Lost and Found")}
+        >
           <View>
-            <FontAwesome name="search" size={24} color="#fff" style={styles.iconSquare} />
+            <FontAwesome
+              name="search"
+              size={24}
+              color="#fff"
+              style={styles.iconSquare}
+            />
           </View>
           <Text style={styles.cardTitle}>Lost & Found</Text>
-          <Text style={styles.cardDescription}>Report a lost pet or a found animal.</Text>
+          <Text style={styles.cardDescription}>
+            Report a lost pet or a found animal.
+          </Text>
         </TouchableOpacity>
       </View>
-
-      <TouchableOpacity style={styles.fullWidthCard} onPress={() => navigation.navigate("LostFoundScreen")}>
+      <TouchableOpacity
+        style={styles.fullWidthCard}
+        onPress={() => navigation.navigate("LostFoundScreen")}
+      >
         <View style={styles.cardContent}>
           <View style={styles.iconContainer}>
-            <FontAwesome name="list-alt" size={24} color="#fff" style={styles.iconSquare} />
+            <FontAwesome
+              name="list-alt"
+              size={24}
+              color="#fff"
+              style={styles.iconSquare}
+            />
           </View>
           <View style={styles.textContainer}>
             <Text style={styles.cardTitle}>Feeds</Text>
-            <Text style={styles.cardDesfeeds}>Stay Updated: Your Source for the Latest feeds and Updates.</Text>
+            <Text style={styles.cardDesfeeds}>
+              Stay Updated: Your Source for the Latest feeds and Updates.
+            </Text>
           </View>
         </View>
       </TouchableOpacity>
@@ -118,7 +144,16 @@ export function HomeScreen() {
             style={{ marginBottom: 60 }}
             horizontal
             data={petsToShow}
-            renderItem={({ item }) => <PetCard name={item.name} breed={item.breed} image={item.images[0]} />}
+            renderItem={({ item }) => (
+              <PetCard
+                name={item.name}
+                breed={item.breed}
+                image={item.images[0]}
+                onPress={() =>
+                  navigation.navigate("PetDetailScreen", { petId: item._id })
+                }
+              />
+            )}
             keyExtractor={(item) => item._id}
             showsHorizontalScrollIndicator={false}
           />
@@ -146,11 +181,6 @@ const styles = StyleSheet.create({
     backgroundColor: "#f5f5f5",
     padding: 10,
   },
-  header: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-  },
   bellIconContainer: {
     width: 40,
     height: 40,
@@ -171,15 +201,6 @@ const styles = StyleSheet.create({
   searchInput: {
     flex: 1,
     marginLeft: 10,
-  },
-  columnWrapper: {
-    justifyContent: "space-between",
-    marginBottom: 15,
-  },
-  subHeading: {
-    fontSize: 20,
-    fontWeight: "bold",
-    marginVertical: 10,
   },
   row: {
     flexDirection: "row",
@@ -239,5 +260,10 @@ const styles = StyleSheet.create({
   heading1: {
     fontSize: 20,
     marginBottom: 6,
+  },
+  subHeading: {
+    fontSize: 20,
+    fontWeight: "bold",
+    marginVertical: 10,
   },
 });
