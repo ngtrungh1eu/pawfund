@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -8,11 +8,11 @@ import {
   FlatList,
   ScrollView,
   ActivityIndicator,
-} from "react-native";
-import { PetCard } from "../components/PetCard";
-import { FontAwesome } from "@expo/vector-icons";
-import { NavigationProp, useNavigation } from "@react-navigation/native";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+} from 'react-native';
+import { PetCard } from '../components/PetCard';
+import { FontAwesome } from '@expo/vector-icons';
+import { NavigationProp, useNavigation } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export function HomeScreen() {
   const navigation = useNavigation<NavigationProp<any>>();
@@ -24,12 +24,12 @@ export function HomeScreen() {
   useEffect(() => {
     const fetchPets = async () => {
       try {
-        const response = await fetch("http://10.0.2.2:8000/api/pets/");
+        const response = await fetch('http://10.0.2.2:8000/api/pets/');
         const data = await response.json();
-        setPets(data);
+        setPets(data.data);
         setLoading(false);
       } catch (error) {
-        console.error("Error fetching pets:", error);
+        console.error('Error fetching pets:', error);
         setLoading(false);
       }
     };
@@ -39,12 +39,12 @@ export function HomeScreen() {
   useEffect(() => {
     const fetchUsername = async () => {
       try {
-        const savedUsername = await AsyncStorage.getItem("username");
+        const savedUsername = await AsyncStorage.getItem('username');
         if (savedUsername) {
           setUsername(savedUsername);
         }
       } catch (error) {
-        console.error("Error fetching username from AsyncStorage:", error);
+        console.error('Error fetching username from AsyncStorage:', error);
       }
     };
 
@@ -56,9 +56,7 @@ export function HomeScreen() {
   const ListHeader = () => (
     <View>
       <View>
-        <Text style={styles.heading1}>
-          {username ? `Hello ${username}!` : "Hello!"}
-        </Text>
+        <Text style={styles.heading1}>{username ? `Hello ${username}!` : 'Hello!'}</Text>
         <Text style={styles.heading}>Ready to Rescue?</Text>
       </View>
       <View style={styles.bellIconContainer}>
@@ -66,61 +64,33 @@ export function HomeScreen() {
       </View>
       <View style={styles.searchBar}>
         <FontAwesome name="search" size={20} color="gray" />
-        <TextInput
-          style={styles.searchInput}
-          placeholder="Search nearest pet"
-        />
+        <TextInput style={styles.searchInput} placeholder="Search nearest pet" />
         <FontAwesome name="filter" size={20} color="gray" />
       </View>
       <View style={styles.row}>
-        <TouchableOpacity
-          style={styles.card}
-          onPress={() => navigation.navigate("Adopt a pet")}
-        >
+        <TouchableOpacity style={styles.card} onPress={() => navigation.navigate('Adopt a pet')}>
           <View>
-            <FontAwesome
-              name="paw"
-              size={24}
-              color="#fff"
-              style={styles.iconSquare}
-            />
+            <FontAwesome name="paw" size={24} color="#fff" style={styles.iconSquare} />
           </View>
           <Text style={styles.cardTitle}>Adopt a Pet</Text>
-          <Text style={styles.cardDescription}>
-            Browse animals available for adoption.
-          </Text>
+          <Text style={styles.cardDescription}>Browse animals available for adoption.</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity
-          style={styles.card}
-          onPress={() => navigation.navigate("Lost and Found")}
-        >
+        <TouchableOpacity style={styles.card} onPress={() => navigation.navigate('Lost and Found')}>
           <View>
-            <FontAwesome
-              name="search"
-              size={24}
-              color="#fff"
-              style={styles.iconSquare}
-            />
+            <FontAwesome name="search" size={24} color="#fff" style={styles.iconSquare} />
           </View>
           <Text style={styles.cardTitle}>Lost & Found</Text>
-          <Text style={styles.cardDescription}>
-            Report a lost pet or a found animal.
-          </Text>
+          <Text style={styles.cardDescription}>Report a lost pet or a found animal.</Text>
         </TouchableOpacity>
       </View>
       <TouchableOpacity
         style={styles.fullWidthCard}
-        onPress={() => navigation.navigate("LostFoundScreen")}
+        onPress={() => navigation.navigate('LostFoundScreen')}
       >
         <View style={styles.cardContent}>
           <View style={styles.iconContainer}>
-            <FontAwesome
-              name="list-alt"
-              size={24}
-              color="#fff"
-              style={styles.iconSquare}
-            />
+            <FontAwesome name="list-alt" size={24} color="#fff" style={styles.iconSquare} />
           </View>
           <View style={styles.textContainer}>
             <Text style={styles.cardTitle}>Feeds</Text>
@@ -149,9 +119,7 @@ export function HomeScreen() {
                 name={item.name}
                 breed={item.breed}
                 image={item.images[0]}
-                onPress={() =>
-                  navigation.navigate("PetDetailScreen", { petId: item._id })
-                }
+                onPress={() => navigation.navigate('PetDetailScreen', { petId: item._id })}
               />
             )}
             keyExtractor={(item) => item._id}
@@ -178,24 +146,24 @@ export function HomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#f5f5f5",
+    backgroundColor: '#f5f5f5',
     padding: 10,
   },
   bellIconContainer: {
     width: 40,
     height: 40,
-    backgroundColor: "#16A99F1A",
+    backgroundColor: '#16A99F1A',
     borderRadius: 20,
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   searchBar: {
-    flexDirection: "row",
-    backgroundColor: "#fff",
+    flexDirection: 'row',
+    backgroundColor: '#fff',
     borderRadius: 10,
     paddingHorizontal: 10,
     paddingVertical: 8,
-    alignItems: "center",
+    alignItems: 'center',
     marginVertical: 20,
   },
   searchInput: {
@@ -203,20 +171,20 @@ const styles = StyleSheet.create({
     marginLeft: 10,
   },
   row: {
-    flexDirection: "row",
-    justifyContent: "space-between",
+    flexDirection: 'row',
+    justifyContent: 'space-between',
     marginBottom: 20,
   },
   card: {
-    backgroundColor: "#16A99F1A",
-    width: "48%",
+    backgroundColor: '#16A99F1A',
+    width: '48%',
     padding: 20,
     borderRadius: 10,
-    alignItems: "center",
+    alignItems: 'center',
   },
   cardContent: {
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   iconContainer: {
     marginRight: 10,
@@ -227,34 +195,34 @@ const styles = StyleSheet.create({
   iconSquare: {
     width: 50,
     height: 50,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "#16A99F",
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#16A99F',
   },
   cardTitle: {
     fontSize: 18,
-    fontWeight: "bold",
-    color: "#16A99F",
+    fontWeight: 'bold',
+    color: '#16A99F',
     marginBottom: 5,
   },
   cardDescription: {
-    textAlign: "center",
-    color: "#000",
+    textAlign: 'center',
+    color: '#000',
   },
   cardDesfeeds: {
-    textAlign: "left",
-    color: "#000",
+    textAlign: 'left',
+    color: '#000',
   },
   fullWidthCard: {
-    backgroundColor: "#16A99F1A",
-    width: "100%",
+    backgroundColor: '#16A99F1A',
+    width: '100%',
     padding: 15,
     borderRadius: 10,
-    alignItems: "center",
+    alignItems: 'center',
   },
   heading: {
     fontSize: 24,
-    fontWeight: "bold",
+    fontWeight: 'bold',
     marginBottom: 10,
   },
   heading1: {
@@ -263,7 +231,7 @@ const styles = StyleSheet.create({
   },
   subHeading: {
     fontSize: 20,
-    fontWeight: "bold",
+    fontWeight: 'bold',
     marginVertical: 10,
   },
 });

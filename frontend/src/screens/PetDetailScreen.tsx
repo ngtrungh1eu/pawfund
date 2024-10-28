@@ -1,13 +1,6 @@
-import React, { useState, useEffect } from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  Image,
-  TouchableOpacity,
-  ScrollView,
-} from "react-native";
-import { FontAwesome } from "@expo/vector-icons";
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, Image, TouchableOpacity, ScrollView } from 'react-native';
+import { FontAwesome } from '@expo/vector-icons';
 
 export function PetDetailScreen({ route }) {
   const [pet, setPet] = useState(null);
@@ -21,9 +14,9 @@ export function PetDetailScreen({ route }) {
       try {
         const response = await fetch(`http://10.0.2.2:8000/api/pets/${petId}`);
         const data = await response.json();
-        setPet(data);
+        setPet(data.data);
       } catch (error) {
-        console.error("Error fetching pet details:", error);
+        console.error('Error fetching pet details:', error);
       }
     };
 
@@ -52,9 +45,9 @@ export function PetDetailScreen({ route }) {
         </View>
         <TouchableOpacity onPress={() => setIsFavorite(!isFavorite)}>
           <FontAwesome
-            name={isFavorite ? "heart" : "heart-o"}
+            name={isFavorite ? 'heart' : 'heart-o'}
             size={30}
-            color={isFavorite ? "red" : "#16A99F"}
+            color={isFavorite ? 'red' : '#16A99F'}
           />
         </TouchableOpacity>
       </View>
@@ -114,74 +107,74 @@ export function PetDetailScreen({ route }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#f5f5f5",
+    backgroundColor: '#f5f5f5',
     padding: 20,
   },
   petImage: {
-    width: "100%",
+    width: '100%',
     height: 300, // Fixed height for better display
     borderRadius: 10,
     marginBottom: 20,
   },
   header: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
     marginBottom: 20,
   },
   nameAddressContainer: {
-    flexDirection: "column",
+    flexDirection: 'column',
   },
   petName: {
     fontSize: 24,
-    fontWeight: "bold",
-    color: "#16A99F",
+    fontWeight: 'bold',
+    color: '#16A99F',
   },
   petAddress: {
     fontSize: 16,
-    color: "#666",
+    color: '#666',
   },
   infoCardsContainer: {
     marginBottom: 20,
   },
   row: {
-    flexDirection: "row",
-    justifyContent: "space-between",
+    flexDirection: 'row',
+    justifyContent: 'space-between',
     marginBottom: 10, // Add spacing between rows
   },
   infoCard: {
-    flexDirection: "column",
-    alignItems: "center",
-    backgroundColor: "#16A99F1A",
+    flexDirection: 'column',
+    alignItems: 'center',
+    backgroundColor: '#16A99F1A',
     padding: 15,
     borderRadius: 10,
-    width: "48%", // Adjust width to take 2 cards per row
+    width: '48%', // Adjust width to take 2 cards per row
   },
   infoText: {
     marginTop: 5,
     fontSize: 14,
-    color: "#333",
+    color: '#333',
   },
   descriptionTitle: {
     fontSize: 20,
-    fontWeight: "bold",
-    color: "#16A99F",
+    fontWeight: 'bold',
+    color: '#16A99F',
     marginBottom: 10,
   },
   descriptionText: {
     fontSize: 16,
-    color: "#333",
+    color: '#333',
     marginBottom: 20,
   },
   ownerInfoCard: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    backgroundColor: "#fff",
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    backgroundColor: '#fff',
     padding: 15,
     borderRadius: 30,
     marginTop: 10,
-    shadowColor: "#000",
+    shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.2,
     shadowRadius: 2,
@@ -189,8 +182,8 @@ const styles = StyleSheet.create({
     marginBottom: 50,
   },
   ownerContainer: {
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   ownerAvatar: {
     width: 50,
@@ -200,14 +193,14 @@ const styles = StyleSheet.create({
   },
   ownerText: {
     fontSize: 16,
-    color: "#333",
+    color: '#333',
   },
   iconContainer: {
-    flexDirection: "row",
+    flexDirection: 'row',
   },
   iconWrapper: {
     marginLeft: 25,
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
