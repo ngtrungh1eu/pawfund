@@ -1,21 +1,23 @@
 import React from "react";
-import { View, Text, Image, StyleSheet } from "react-native";
+import { View, Text, Image, StyleSheet, TouchableOpacity } from "react-native";
 
 export function PetCard({
   name,
   breed,
   image,
+  onPress,
 }: {
   name: string;
   breed: string;
   image: string;
+  onPress: () => void;
 }) {
   return (
-    <View style={styles.card}>
+    <TouchableOpacity onPress={onPress} style={styles.card}>
       <Image source={{ uri: image }} style={styles.image} />
       <Text style={styles.name}>{name}</Text>
       <Text style={styles.type}>{breed}</Text>
-    </View>
+    </TouchableOpacity>
   );
 }
 
@@ -42,7 +44,7 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   type: {
-    fontSize: 14,
+    fontSize: 11,
     color: "gray",
   },
 });
