@@ -9,14 +9,13 @@ const shelterSchema = new mongoose.Schema({
     city: String,
     state: String,
     zipCode: String,
-    country: String
+    country: String,
   },
   description: String,
-  website: String,
   staff: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
   pets: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Pet' }],
   createdAt: { type: Date, default: Date.now },
-  updatedAt: { type: Date, default: Date.now }
+  updatedAt: { type: Date, default: Date.now },
 });
 
 module.exports = mongoose.model('Shelter', shelterSchema);
