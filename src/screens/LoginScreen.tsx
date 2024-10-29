@@ -16,6 +16,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 
 import useAuth from '../hooks/useAuth';
+import { ActivityIndicator } from 'react-native-paper';
 
 export default function LoginScreen() {
     const navigation = useNavigation();
@@ -24,6 +25,7 @@ export default function LoginScreen() {
     const [usernameError, setUsernameError] = useState('');
     const [passwordError, setPasswordError] = useState('');
     const [showPassword, setShowPassword] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
     const { login, isAuthenticated } = useAuth();
 
     const validateUsername = (text: string) => {
@@ -75,11 +77,13 @@ export default function LoginScreen() {
             );
             return;
         }
-
+        setIsLoading(true);
         try {
             await login(username, password);
         } catch (error: any) {
             Alert.alert('Login Error', error.message);
+        } finally {
+            setIsLoading(false);
         }
     };
     useEffect(() => {
@@ -104,7 +108,7 @@ export default function LoginScreen() {
                     />
                 </View>
                 <View style={styles.inputContainer}>
-                    <Text style={styles.label}>Email</Text>
+                    <Text style={styles.label}>Username</Text>
                     <View
                         style={[
                             styles.inputWrapper,
@@ -116,10 +120,10 @@ export default function LoginScreen() {
                                 styles.input,
                                 usernameError ? styles.inputError : null,
                             ]}
-                            placeholder="Enter your email"
+                            placeholder="Enter your username"
                             value={username}
                             onChangeText={validateUsername}
-                            keyboardType="email-address"
+                            keyboardType="default"
                         />
                         <Ionicons
                             name="at"
@@ -175,7 +179,11 @@ export default function LoginScreen() {
             </ScrollView>
             <View style={styles.bottomContainer}>
                 <TouchableOpacity style={styles.button} onPress={handleLogin}>
-                    <Text style={styles.buttonText}>Sign In</Text>
+                    {isLoading ? (
+                        <ActivityIndicator size="small" color="#fff" />
+                    ) : (
+                        <Text style={styles.buttonText}>Sign In</Text>
+                    )}
                 </TouchableOpacity>
                 <View style={styles.signupContainer}>
                     <Text>You don't have any account? </Text>

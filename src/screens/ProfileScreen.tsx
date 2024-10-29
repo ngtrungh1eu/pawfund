@@ -12,7 +12,7 @@ import { FontAwesome, Ionicons } from '@expo/vector-icons';
 import useAuth from '../hooks/useAuth';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
-import { useNavigation } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 type UserProfile = {
     _id: string;
     username: string;
@@ -20,31 +20,37 @@ type UserProfile = {
     avatar?: string;
 };
 
-export function ProfileScreen() {
+export function ProfileScreen({ route }: any) {
     const navigation = useNavigation();
     const { logout } = useAuth();
     const [user, setUser] = useState<UserProfile | null>(null);
-    useEffect(() => {
-        const fetchProfile = async () => {
-            try {
-                const token = await AsyncStorage.getItem('access_token');
-                const response = await axios.get(
-                    'http://10.0.2.2:8000/api/auth/profile',
-                    {
-                        headers: {
-                            Authorization: `Bearer ${token}`,
-                        },
-                    }
-                );
-                setUser(response.data);
-            } catch (error) {
-                console.error('Error fetching profile:', error);
-                Alert.alert('Error', 'Failed to fetch profile data');
-            }
-        };
+    useFocusEffect(
+        React.useCallback(() => {
+            const fetchProfile = async () => {
+                try {
+                    const token = await AsyncStorage.getItem('access_token');
+                    const response = await axios.get(
+                        'http://10.0.2.2:8000/api/auth/profile',
+                        {
+                            headers: {
+                                Authorization: `Bearer ${token}`,
+                            },
+                        }
+                    );
+                    setUser(response.data);
+                } catch (error) {
+                    console.error('Error fetching profile:', error);
+                    Alert.alert('Error', 'Failed to fetch profile data');
+                }
+            };
 
-        fetchProfile();
-    }, []);
+            fetchProfile();
+
+            if (route.params?.updatedUser) {
+                setUser((prev) => ({ ...prev, ...route.params.updatedUser }));
+            }
+        }, [route.params])
+    );
     // Handle Log Out action
     const handleLogout = async () => {
         await logout(); // Gọi hàm logout từ context

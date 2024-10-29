@@ -9,8 +9,6 @@ import { ProfileScreen } from '../screens/ProfileScreen';
 import LostFoundForm from '../screens/LostFoundForm';
 import { DashboardScreen } from './../screens/shelter/DashboardScreen';
 
-
-
 const Tab = createBottomTabNavigator();
 
 
