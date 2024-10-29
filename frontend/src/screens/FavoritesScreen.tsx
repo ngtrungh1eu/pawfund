@@ -4,16 +4,16 @@ import {
     Text,
     StyleSheet,
     TouchableOpacity,
-    FlatList,
     Image,
     ActivityIndicator,
+    Alert,
 } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
 import { usePetContext } from '../utils/PetContext';
 import { SwipeListView } from 'react-native-swipe-list-view';
 
 export function FavoritesScreen({ navigation }) {
-    const { favorites, toggleFavorite } = usePetContext(); // Nhận toggleFavorite
+    const { favorites, toggleFavorite, removeAllFavorites } = usePetContext();
     const [petsData, setPetsData] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -42,6 +42,13 @@ export function FavoritesScreen({ navigation }) {
         fetchFavoritePets();
     }, [favorites]);
 
+    const confirmRemoveAll = () => {
+        Alert.alert('Remove All', 'Do you want to remove all favorite pets?', [
+            { text: 'Cancel', style: 'cancel' },
+            { text: 'Confirm', onPress: () => removeAllFavorites() },
+        ]);
+    };
+
     const renderItem = ({ item }) => (
         <TouchableOpacity
             style={styles.card}
@@ -69,7 +76,7 @@ export function FavoritesScreen({ navigation }) {
                 style={styles.removeButton}
                 onPress={() => toggleFavorite(item._id)}
             >
-                <Text style={styles.removeButtonText}>Xóa</Text>
+                <Text style={styles.removeButtonText}>Remove</Text>
             </TouchableOpacity>
         </View>
     );
@@ -92,9 +99,18 @@ export function FavoritesScreen({ navigation }) {
 
     return (
         <View style={styles.container}>
+            {petsData.length > 1 && (
+                <TouchableOpacity
+                    style={styles.removeAllButton}
+                    onPress={confirmRemoveAll}
+                >
+                    <Text style={styles.removeAllButtonText}>Remove All</Text>
+                </TouchableOpacity>
+            )}
             {petsData.length === 0 ? (
                 <Text style={styles.emptyMessage}>
-                    Không có thú cưng yêu thích nào.
+                    No favorite pets found. Add some by clicking on the heart
+                    icon on the pet details screen.
                 </Text>
             ) : (
                 <SwipeListView
@@ -115,6 +131,17 @@ const styles = StyleSheet.create({
         flex: 1,
         padding: 16,
         backgroundColor: '#fff',
+    },
+    removeAllButton: {
+        backgroundColor: '#FF3D00',
+        padding: 10,
+        borderRadius: 8,
+        alignItems: 'center',
+        marginBottom: 10,
+    },
+    removeAllButtonText: {
+        color: '#fff',
+        fontWeight: 'bold',
     },
     card: {
         flexDirection: 'row',
@@ -153,8 +180,6 @@ const styles = StyleSheet.create({
         position: 'absolute',
         right: 0,
         top: 0,
-        // backgroundColor: 'rgba(0, 0, 0, 0.5)',
-        // width: 75,
         flexDirection: 'row',
         justifyContent: 'flex-end',
         alignItems: 'center',
@@ -165,9 +190,8 @@ const styles = StyleSheet.create({
     removeButton: {
         backgroundColor: '#FF3D00',
         borderRadius: 8,
-
         paddingVertical: 10,
-        paddingHorizontal: 15,
+        // paddingHorizontal: 15,
     },
     removeButtonText: {
         color: '#fff',

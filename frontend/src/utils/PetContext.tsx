@@ -3,6 +3,7 @@ import React, { createContext, useContext, useState, ReactNode } from 'react';
 interface PetContextType {
     favorites: string[];
     toggleFavorite: (petId: string) => void;
+    removeAllFavorites: () => void;
 }
 
 const PetContext = createContext<PetContextType | undefined>(undefined);
@@ -21,9 +22,13 @@ export const PetProvider: React.FC<{ children: ReactNode }> = ({
             }
         });
     };
-
+    const removeAllFavorites = () => {
+        setFavorites([]);
+    };
     return (
-        <PetContext.Provider value={{ favorites, toggleFavorite }}>
+        <PetContext.Provider
+            value={{ favorites, toggleFavorite, removeAllFavorites }}
+        >
             {children}
         </PetContext.Provider>
     );
