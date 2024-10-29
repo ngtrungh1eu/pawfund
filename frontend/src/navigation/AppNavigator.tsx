@@ -28,6 +28,10 @@ import { AdoptPetScreen } from '../screens/AdoptPetScreen';
 import LostFoundForm from '../screens/LostFoundForm';
 import { PetDetailScreen } from '../screens/PetDetailScreen';
 import ProfileInfoScreen from '../screens/ProfileInfoScreen';
+import { DashboardScreen } from './../screens/shelter/DashboardScreen';
+import { RegisterAnimalScreen } from './../screens/shelter/RegisterAnimalScreen';
+import ConfirmAdoptionScreen from './../screens/shelter/ConfirmAdoptionScreen';
+import { AdoptionHistoryScreen } from '../screens/shelter/AdoptionHistoryScreen';
 
 const Stack = createStackNavigator();
 
@@ -154,6 +158,10 @@ const AppNavigator = () => {
                             component={NoChat}
                             options={{ headerShown: false }}
                         />
+                          <Stack.Screen name="Dashboard" component={DashboardScreen} />
+                <Stack.Screen name="Register Animal" component={RegisterAnimalScreen} />
+                <Stack.Screen name="Confirm Adoption" component={ConfirmAdoptionScreen} />
+                <Stack.Screen name="Adoption History" component={AdoptionHistoryScreen} />
                     </>
                 ) : (
                     <>
@@ -172,6 +180,7 @@ const AppNavigator = () => {
                             component={ProfileSetupComplete}
                             options={{ headerShown: false }}
                         />
+                        
                     </>
                 )}
             </Stack.Navigator>
