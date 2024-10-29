@@ -11,6 +11,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { jwtDecode } from 'jwt-decode';
 import { JwtPayload } from 'jwt-decode';
 import { login as apiLogin, logout as apiLogout } from './src/services/auth';
+import { PetProvider } from './src/utils/PetContext';
 interface CustomJwtPayload extends JwtPayload {
     userId: string;
     username: string;
@@ -85,8 +86,10 @@ export default function App() {
     return (
         <SafeAreaView style={{ flex: 1 }}>
             <AuthContext.Provider value={{ isAuthenticated, login, logout }}>
-                <StatusBar style="auto" />
-                <AppNavigator />
+                <PetProvider>
+                    <StatusBar style="auto" />
+                    <AppNavigator />
+                </PetProvider>
             </AuthContext.Provider>
         </SafeAreaView>
     );

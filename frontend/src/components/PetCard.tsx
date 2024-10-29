@@ -1,50 +1,71 @@
-import React from "react";
-import { View, Text, Image, StyleSheet, TouchableOpacity } from "react-native";
+// PetCard.js
+import React from 'react';
+import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
+import { FontAwesome } from '@expo/vector-icons';
 
-export function PetCard({
-  name,
-  breed,
-  image,
-  onPress,
-}: {
-  name: string;
-  breed: string;
-  image: string;
-  onPress: () => void;
-}) {
-  return (
-    <TouchableOpacity onPress={onPress} style={styles.card}>
-      <Image source={{ uri: image }} style={styles.image} />
-      <Text style={styles.name}>{name}</Text>
-      <Text style={styles.type}>{breed}</Text>
-    </TouchableOpacity>
-  );
-}
+export const PetCard = ({
+    name,
+    breed,
+    image,
+    isFavorite,
+    onFavoriteToggle,
+    onPress,
+}) => {
+    return (
+        <TouchableOpacity style={styles.card} onPress={onPress}>
+            <View style={styles.imageContainer}>
+                <Image source={{ uri: image }} style={styles.image} />
+                <TouchableOpacity
+                    style={styles.favoriteIcon}
+                    onPress={onFavoriteToggle}
+                >
+                    <FontAwesome
+                        name={isFavorite ? 'heart' : 'heart-o'}
+                        size={24}
+                        color={isFavorite ? 'red' : '#16A99F'}
+                    />
+                </TouchableOpacity>
+            </View>
+            <Text style={styles.name}>{name}</Text>
+            <Text style={styles.breed}>{breed}</Text>
+        </TouchableOpacity>
+    );
+};
 
 const styles = StyleSheet.create({
-  card: {
-    borderRadius: 10,
-    backgroundColor: "#fff",
-    padding: 10,
-    margin: 5,
-    alignItems: "center",
-    shadowColor: "#000",
-    shadowOffset: { width: 1, height: 2 },
-    shadowOpacity: 0.3,
-    shadowRadius: 3,
-    elevation: 5,
-  },
-  image: {
-    width: 100,
-    height: 100,
-  },
-  name: {
-    fontSize: 16,
-    fontWeight: "bold",
-    marginTop: 10,
-  },
-  type: {
-    fontSize: 11,
-    color: "gray",
-  },
+    card: {
+        backgroundColor: '#fff',
+        borderRadius: 10,
+        padding: 10,
+        margin: 5,
+        alignItems: 'center',
+        width: 150,
+        elevation: 2, // Add shadow effect for Android
+        shadowColor: '#000', // Shadow for iOS
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 2,
+    },
+    imageContainer: {
+        position: 'relative',
+        width: '100%',
+    },
+    image: {
+        width: '100%',
+        height: 100,
+        borderRadius: 10,
+    },
+    favoriteIcon: {
+        position: 'absolute',
+        top: 10,
+        right: 10,
+    },
+    name: {
+        fontSize: 18,
+        fontWeight: 'bold',
+    },
+    breed: {
+        fontSize: 14,
+        color: '#666',
+    },
 });
