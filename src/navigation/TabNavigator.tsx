@@ -7,6 +7,9 @@ import { FavoritesScreen } from '../screens/FavoritesScreen';
 import { ChatScreen } from '../screens/ChatScreen';
 import { ProfileScreen } from '../screens/ProfileScreen';
 import LostFoundForm from '../screens/LostFoundForm';
+import { DashboardScreen } from './../screens/shelter/DashboardScreen';
+
+
 
 const Tab = createBottomTabNavigator();
 
@@ -43,7 +46,7 @@ export function TabNavigator() {
         {/* Custom SOS Tab */}
         <Tab.Screen
         name="SOS"
-        component={LostFoundForm}
+        component={DashboardScreen}
         options={{
           tabBarIcon: ({ focused }) => (
             <View
