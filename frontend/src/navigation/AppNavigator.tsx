@@ -27,6 +27,7 @@ import LostFoundScreen from '../screens/LostFoundScreen';
 import { AdoptPetScreen } from '../screens/AdoptPetScreen';
 import LostFoundForm from '../screens/LostFoundForm';
 import { PetDetailScreen } from '../screens/PetDetailScreen';
+import ProfileInfoScreen from '../screens/ProfileInfoScreen';
 
 const Stack = createStackNavigator();
 
@@ -82,6 +83,11 @@ const AppNavigator = () => {
                             name="DonatedTransactionDetails"
                             component={DonatedTransactionDetails}
                             options={{ headerShown: false }}
+                        />
+                        <Stack.Screen
+                            name="ProfileInfoScreen"
+                            component={ProfileInfoScreen}
+                            options={{ headerShown: true }}
                         />
                         <Stack.Screen
                             name="ResetPassword"
