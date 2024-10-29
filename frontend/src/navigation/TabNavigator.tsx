@@ -11,7 +11,6 @@ import { DashboardScreen } from './../screens/shelter/DashboardScreen';
 
 const Tab = createBottomTabNavigator();
 
-
 export function TabNavigator() {
   return (
     <Tab.Navigator
@@ -38,11 +37,11 @@ export function TabNavigator() {
         },
       })}
     >
-      <Tab.Screen name="Home" component={HomeScreen} /> 
+      <Tab.Screen name="Home" component={HomeScreen} />
       <Tab.Screen name="Favorites" component={FavoritesScreen} />
 
-        {/* Custom SOS Tab */}
-        <Tab.Screen
+      {/* Custom SOS Tab */}
+      <Tab.Screen
         name="SOS"
         component={DashboardScreen}
         options={{
@@ -59,15 +58,12 @@ export function TabNavigator() {
                 alignItems: 'center',
               }}
             >
-              <Text style={{ color: '#fff', fontWeight: 'bold', fontSize: 16 }}>
-                SOS
-              </Text>
+              <Text style={{ color: '#fff', fontWeight: 'bold', fontSize: 16 }}>SOS</Text>
             </View>
           ),
-          tabBarLabel: () => null, 
+          tabBarLabel: () => null,
         }}
       />
-
 
       <Tab.Screen name="Chats" component={ChatScreen} />
       <Tab.Screen name="Profile" component={ProfileScreen} />
