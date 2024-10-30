@@ -21,7 +21,6 @@ import SystemSettingsScreen from "../screens/SystemSettingsScreen";
 import UPISetting from "../screens/UPISettingScreen";
 import VerifyUPISetting from "../screens/VerifyUPISettingScreen";
 import { createStackNavigator } from "@react-navigation/stack";
-import useAuth from "../hooks/useAuth";
 import { TabNavigator } from "./TabNavigator";
 import LostFoundScreen from "../screens/LostFoundScreen";
 import { AdoptPetScreen } from "../screens/AdoptPetScreen";
@@ -35,7 +34,7 @@ import { AdoptionHistoryScreen } from "../screens/shelter/AdoptionHistoryScreen"
 import { EventsScreen } from "../screens/EventsScreen";
 import EventDetailScreen from "../screens/EventDetailScreen";
 import PetHistoryScreen from "../screens/PetHistoryScreen";
-
+import { useAuth } from "../context/AuthProvider";
 
 const Stack = createStackNavigator();
 
@@ -43,7 +42,7 @@ const AppNavigator = () => {
   const { isAuthenticated } = useAuth();
 
   return (
-    <NavigationContainer>
+    <>
       <Stack.Navigator initialRouteName="Splash">
         <Stack.Screen
           name="Splash"
@@ -211,9 +210,8 @@ const AppNavigator = () => {
           </>
         )}
       </Stack.Navigator>
-    </NavigationContainer>
+    </>
   );
-
 };
 
 export default AppNavigator;
