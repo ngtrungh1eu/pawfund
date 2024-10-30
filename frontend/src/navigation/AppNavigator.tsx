@@ -176,7 +176,11 @@ const AppNavigator = () => {
               component={NoChat}
               options={{ headerShown: false }}
             />
-            <Stack.Screen name="Dashboard" component={DashboardScreen} />
+            <Stack.Screen
+              name="Dashboard"
+              component={DashboardScreen}
+              options={{ headerShown: false }}
+            />
             <Stack.Screen
               name="Register Animal"
               component={RegisterAnimalScreen}
