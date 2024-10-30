@@ -64,12 +64,15 @@ export function ListPetComponent({ pets }) {
       key={`numColumns-${numColumns}`} // Unique key based on numColumns
       data={petsToShow}
       renderItem={({ item }) => (
-        <TouchableOpacity
-          onPress={() =>
-            navigation.navigate("PetDetailScreen", { petId: item.id })
-          }
-        >
-          <PetCard name={item.name} breed={item.breed} image={item.images[0]} />
+        <TouchableOpacity>
+          <PetCard
+            name={item.name}
+            breed={item.breed}
+            image={item.images[0]}
+            onPress={() =>
+              navigation.navigate("PetDetailScreen", { petId: item._id })
+            }
+          />
         </TouchableOpacity>
       )}
       keyExtractor={(item, index) =>

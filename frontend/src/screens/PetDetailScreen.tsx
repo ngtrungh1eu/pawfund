@@ -33,7 +33,6 @@ export function PetDetailScreen({ route }) {
     fetchPetDetail();
   }, [petId]);
 
-  // Function to show confirmation dialog and handle adoption
   const handleAdoptPress = async () => {
     Alert.alert(
       "Confirm Adoption",
@@ -47,7 +46,6 @@ export function PetDetailScreen({ route }) {
           text: "Confirm",
           onPress: async () => {
             try {
-              // Retrieve user ID from AsyncStorage
               const accessToken = await AsyncStorage.getItem("access_token");
               const userResponse = await axios.get(
                 "http://10.0.2.2:8000/api/auth/profile",
@@ -59,10 +57,7 @@ export function PetDetailScreen({ route }) {
               );
 
               const userId = userResponse.data._id;
-              const shelterId = pet.shelter._id; // Get shelter ID
-              console.log("User ID:", userId);
-              console.log("Shelter ID:", shelterId);
-              // Log user and shelter IDs for debugging
+              const shelterId = pet.shelter._id;
               console.log("User ID:", userId);
               console.log("Shelter ID:", shelterId);
 
@@ -74,14 +69,8 @@ export function PetDetailScreen({ route }) {
 
               const adoptionRequest = {
                 pet: pet._id,
-                customer: userId, // Use the retrieved user ID
+                customer: userId,
                 shelter: shelterId,
-                // status: "pending",
-                // applicationDate: new Date(),
-                // approvalDate: null,
-                // rejectionReason: null,
-                // adoptionFee: pet.adoptionFee,
-                // notes: "Looking forward to adopting!",
               };
 
               console.log("Adoption request object:", adoptionRequest);
@@ -165,23 +154,13 @@ export function PetDetailScreen({ route }) {
       <Text style={styles.descriptionTitle}>About {pet.name}</Text>
       <Text style={styles.descriptionText}>{pet.description}</Text>
 
-      <View style={styles.ownerInfoCard}>
-        <View style={styles.ownerContainer}>
-          <Image source={{ uri: pet.ownerAvatar }} style={styles.ownerAvatar} />
-          <Text style={styles.ownerText}>Owner: {pet.owner}</Text>
-        </View>
-
-        <View style={styles.iconContainer}>
-          <TouchableOpacity style={styles.iconWrapper}>
-            <FontAwesome name="phone" size={24} color="#16A99F" />
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.iconWrapper}>
-            <FontAwesome name="envelope" size={24} color="#16A99F" />
-          </TouchableOpacity>
-        </View>
+      <View style={styles.shelterInfoCard}>
+        <Text style={styles.shelterTitle}>Shelter Information</Text>
+        <Text style={styles.shelterText}>Name: {pet.shelter.name}</Text>
+        <Text style={styles.shelterText}>Phone: {pet.shelter.phoneNumber}</Text>
+        <Text style={styles.shelterText}>Email: {pet.shelter.email}</Text>
       </View>
 
-      {/* Adopt Button */}
       <View style={styles.adoptButtonContainer}>
         <TouchableOpacity onPress={handleAdoptPress} style={styles.adoptButton}>
           <Text style={styles.adoptButtonText}>Adopt this Pet</Text>
@@ -253,13 +232,10 @@ const styles = StyleSheet.create({
     color: "#333",
     marginBottom: 20,
   },
-  ownerInfoCard: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
+  shelterInfoCard: {
     backgroundColor: "#fff",
     padding: 15,
-    borderRadius: 30,
+    borderRadius: 10,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.2,
@@ -267,29 +243,20 @@ const styles = StyleSheet.create({
     elevation: 3,
     marginBottom: 20,
   },
-  ownerContainer: {
-    flexDirection: "row",
-    alignItems: "center",
+  shelterTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: "#16A99F",
+    marginBottom: 10,
   },
-  ownerAvatar: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    marginRight: 15,
-  },
-  ownerText: {
+  shelterText: {
     fontSize: 16,
     color: "#333",
+    marginBottom: 5,
   },
-  iconContainer: {
-    flexDirection: "row",
-  },
-  iconWrapper: {
-    marginLeft: 25,
-    justifyContent: "center",
+  adoptButtonContainer: {
     alignItems: "center",
   },
-
   adoptButton: {
     backgroundColor: "#16A99F",
     borderRadius: 30,
@@ -297,6 +264,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     marginBottom: 50,
+    width: "100%",
   },
   adoptButtonText: {
     color: "#fff",
