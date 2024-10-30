@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, FlatList, Alert } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, FlatList, Alert, Modal } from 'react-native';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { MaterialIcons } from '@expo/vector-icons'; // For displaying icons
@@ -15,50 +15,73 @@ interface AdoptionRequest {
 
 export default function ConfirmAdoptionScreen() {
   const [requests, setRequests] = useState<AdoptionRequest[]>([]);
-  const [loading, setLoading] = useState(true); 
+  const [loading, setLoading] = useState(true);
+  const [selectedFilter, setSelectedFilter] = useState<'pending' | 'approved' | 'all'>('all');
+  const [isModalVisible, setModalVisible] = useState(false);
   const API_URL = 'http://10.0.2.2:8000/api/adoptions/';
 
-  // Fetch adoption requests 
+  // Fetch adoption requests
   useEffect(() => {
     const fetchAdoptionRequests = async () => {
-      setLoading(true); 
+      setLoading(true);
       try {
-        const token = await AsyncStorage.getItem('access_token'); 
+        const token = await AsyncStorage.getItem('access_token');
         if (!token) {
           Alert.alert('Error', 'No token found. Please log in again.');
           return;
         }
-  
+
         const response = await axios.get(API_URL, {
           headers: {
-            Authorization: `Bearer ${token}`, 
+            Authorization: `Bearer ${token}`,
           },
         });
-  
+
         const adoptionData = response.data.data.map((adoption: any) => ({
           id: adoption._id,
           petName: adoption.pet.name,
           adopterName: adoption.customer.username,
           adopterEmail: adoption.customer.email,
           shelterName: adoption.shelter.name,
-  
           status: adoption.status,
         }));
-  
+
         setRequests(adoptionData);
       } catch (error) {
         console.error('Error fetching adoption requests:', error);
         Alert.alert('Error', 'Could not fetch adoption requests.');
       } finally {
-        setLoading(false); 
+        setLoading(false);
       }
     };
-  
+
     fetchAdoptionRequests();
   }, []);
-  
 
-  // Handle Accepting 
+  // Handle completing an approved request
+  const handleComplete = async (id: string) => {
+    try {
+      const token = await AsyncStorage.getItem('access_token');
+      if (!token) {
+        Alert.alert('Error', 'No token found. Please log in again.');
+        return;
+      }
+
+      await axios.put(`${API_URL}${id}`, { status: 'completed' }, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      setRequests((prevRequests) => prevRequests.filter((request) => request.id !== id));
+      Alert.alert('Success', 'Adoption marked as completed.');
+    } catch (error) {
+      console.error('Error completing adoption request:', error);
+      Alert.alert('Error', 'Could not mark adoption as completed.');
+    }
+  };
+
+  // Handle accepting a pending request
   const handleAccept = async (id: string) => {
     try {
       const token = await AsyncStorage.getItem('access_token');
@@ -69,11 +92,11 @@ export default function ConfirmAdoptionScreen() {
 
       await axios.put(`${API_URL}${id}`, { status: 'approved' }, {
         headers: {
-          Authorization: `Bearer ${token}`, 
+          Authorization: `Bearer ${token}`,
         },
       });
 
-      setRequests((prevRequests) => prevRequests.filter((request) => request.id !== id)); 
+      setRequests((prevRequests) => prevRequests.filter((request) => request.id !== id));
       Alert.alert('Success', 'Adoption request approved.');
     } catch (error) {
       console.error('Error accepting adoption request:', error);
@@ -81,7 +104,7 @@ export default function ConfirmAdoptionScreen() {
     }
   };
 
-  // Handle Rejecting 
+  // Handle rejecting a pending request
   const handleReject = async (id: string) => {
     try {
       const token = await AsyncStorage.getItem('access_token');
@@ -92,16 +115,27 @@ export default function ConfirmAdoptionScreen() {
 
       await axios.put(`${API_URL}${id}`, { status: 'rejected' }, {
         headers: {
-          Authorization: `Bearer ${token}`, 
+          Authorization: `Bearer ${token}`,
         },
       });
 
-      setRequests((prevRequests) => prevRequests.filter((request) => request.id !== id)); 
+      setRequests((prevRequests) => prevRequests.filter((request) => request.id !== id));
       Alert.alert('Success', 'Adoption request rejected.');
     } catch (error) {
       console.error('Error rejecting adoption request:', error);
       Alert.alert('Error', 'Could not reject adoption request.');
     }
+  };
+
+  // Toggle modal for filter options
+  const toggleModal = () => {
+    setModalVisible(!isModalVisible);
+  };
+
+  // Apply filter
+  const applyFilter = (status: 'pending' | 'approved' | 'all') => {
+    setSelectedFilter(status);
+    toggleModal();
   };
 
   const renderRequestItem = ({ item }: { item: AdoptionRequest }) => (
@@ -111,25 +145,35 @@ export default function ConfirmAdoptionScreen() {
       <Text>Adopter Email: {item.adopterEmail}</Text>
       <Text>Shelter: {item.shelterName}</Text>
 
-      
-      <View style={styles.buttonContainer}>
+      {item.status === 'pending' && (
+        <View style={styles.buttonContainer}>
+          <TouchableOpacity
+            style={styles.acceptButton}
+            onPress={() => handleAccept(item.id)}
+          >
+            <Text style={styles.buttonText}>Accept</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.rejectButton}
+            onPress={() => handleReject(item.id)}
+          >
+            <Text style={styles.buttonText}>Reject</Text>
+          </TouchableOpacity>
+        </View>
+      )}
+
+      {item.status === 'approved' && (
         <TouchableOpacity
-          style={styles.acceptButton}
-          onPress={() => handleAccept(item.id)}
+          style={styles.completeButton}
+          onPress={() => handleComplete(item.id)}
         >
-          <Text style={styles.buttonText}>Accept</Text>
+          <Text style={styles.buttonText}>Complete</Text>
         </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.rejectButton}
-          onPress={() => handleReject(item.id)}
-        >
-          <Text style={styles.buttonText}>Reject</Text>
-        </TouchableOpacity>
-      </View>
+      )}
     </View>
   );
 
-  // Show loading 
+  // Show loading
   if (loading) {
     return (
       <View style={styles.container}>
@@ -138,27 +182,68 @@ export default function ConfirmAdoptionScreen() {
     );
   }
 
-  // Filter requests with status 'pending'
-  const pendingRequests = requests.filter(request => request.status === 'pending');
+  // Filter requests: show based on selected filter
+  const filteredRequests = requests.filter((request) => {
+    if (selectedFilter === 'all') return request.status === 'pending' || request.status === 'approved';
+    return request.status === selectedFilter;
+  });
 
-  // Show "No Data" message if there are no pending requests
-  if (pendingRequests.length === 0) {
+  // Show "No Data" message if there are no filtered requests
+  if (filteredRequests.length === 0) {
     return (
       <View style={styles.noDataContainer}>
         <MaterialIcons name="hourglass-empty" size={50} color="gray" />
-        <Text style={styles.noDataText}>No Pending Adoption Requests Available</Text>
+        <Text style={styles.noDataText}>No Pending or Approved Adoption Requests Available</Text>
       </View>
     );
   }
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Confirm Adoption Requests</Text>
+      <View style={styles.headerContainer}>
+        <Text style={styles.title}>Confirm Adoption Requests</Text>
+        {filteredRequests.length > 0 && (
+          <TouchableOpacity onPress={toggleModal}>
+            <MaterialIcons name="filter-list" size={28} color="black" />
+          </TouchableOpacity>
+        )}
+      </View>
+
       <FlatList
-        data={pendingRequests}
+        data={filteredRequests}
         keyExtractor={(item) => item.id}
         renderItem={renderRequestItem}
       />
+
+      {/* Modal for filtering */}
+      <Modal visible={isModalVisible} transparent={true} animationType="fade">
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>Filter by Status</Text>
+            <TouchableOpacity
+              style={styles.modalButton}
+              onPress={() => applyFilter('all')}
+            >
+              <Text style={styles.buttonText}>Show All</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.modalButton}
+              onPress={() => applyFilter('pending')}
+            >
+              <Text style={styles.buttonText}>Pending</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.modalButton}
+              onPress={() => applyFilter('approved')}
+            >
+              <Text style={styles.buttonText}>Approved</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.modalCancelButton} onPress={toggleModal}>
+              <Text style={styles.buttonText}>Cancel</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 }
@@ -169,12 +254,16 @@ const styles = StyleSheet.create({
     padding: 20,
     backgroundColor: '#f2f2f2',
   },
+  headerContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 20,
+  },
   title: {
     fontSize: 24,
     fontWeight: 'bold',
     color: '#16A99F',
-    marginBottom: 20,
-    textAlign: 'center',
   },
   card: {
     backgroundColor: '#fff',
@@ -212,6 +301,13 @@ const styles = StyleSheet.create({
     width: '48%',
     alignItems: 'center',
   },
+  completeButton: {
+    backgroundColor: '#16A99F',
+    padding: 10,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginTop: 10,
+  },
   buttonText: {
     color: '#fff',
     fontWeight: 'bold',
@@ -225,5 +321,36 @@ const styles = StyleSheet.create({
     fontSize: 18,
     marginTop: 10,
     color: 'gray',
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  modalContent: {
+    width: 300,
+    backgroundColor: 'white',
+    padding: 20,
+    borderRadius: 10,
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 20,
+    textAlign: 'center',
+  },
+  modalButton: {
+    padding: 10,
+    backgroundColor: '#16A99F',
+    borderRadius: 8,
+    marginBottom: 10,
+    alignItems: 'center',
+  },
+  modalCancelButton: {
+    padding: 10,
+    backgroundColor: '#f44336',
+    borderRadius: 8,
+    alignItems: 'center',
   },
 });
