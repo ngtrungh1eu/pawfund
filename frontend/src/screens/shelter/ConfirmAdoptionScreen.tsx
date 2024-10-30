@@ -6,12 +6,12 @@ import { MaterialIcons } from '@expo/vector-icons';
 import Dialog from 'react-native-dialog';
 
 interface AdoptionRequest {
-    id: string;
-    petName: string;
-    adopterName: string;
-    adopterEmail: string;
-    shelterName: string;
-    status: string;
+  id: string;
+  petName: string;
+  adopterName: string;
+  adopterEmail: string;
+  shelterName: string;
+  status: string;
 }
 
 export default function ConfirmAdoptionScreen() {
@@ -24,128 +24,45 @@ export default function ConfirmAdoptionScreen() {
   const [reason, setReason] = useState('');
   const API_URL = 'http://10.0.2.2:8000/api/adoptions/';
 
-    // Fetch adoption requests
-    useEffect(() => {
-        const fetchAdoptionRequests = async () => {
-            setLoading(true);
-            try {
-                const token = await AsyncStorage.getItem('access_token');
-                if (!token) {
-                    Alert.alert(
-                        'Error',
-                        'No token found. Please log in again.'
-                    );
-                    return;
-                }
-
-                const response = await axios.get(API_URL, {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
-                });
-
-                const adoptionData = response.data.data.map(
-                    (adoption: any) => ({
-                        id: adoption._id,
-                        petName: adoption.pet.name,
-                        adopterName: adoption.customer.username,
-                        adopterEmail: adoption.customer.email,
-                        shelterName: adoption.shelter.name,
-                        status: adoption.status,
-                    })
-                );
-
-                setRequests(adoptionData);
-            } catch (error) {
-                console.error('Error fetching adoption requests:', error);
-                Alert.alert('Error', 'Could not fetch adoption requests.');
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchAdoptionRequests();
-    }, []);
-
-    // Handle Accepting
-    const handleAccept = async (id: string) => {
-        try {
-            const token = await AsyncStorage.getItem('access_token');
-            if (!token) {
-                Alert.alert('Error', 'No token found. Please log in again.');
-                return;
-            }
-
-            await axios.put(
-                `${API_URL}${id}`,
-                { status: 'approved' },
-                {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
-                }
-            );
-
-            setRequests((prevRequests) =>
-                prevRequests.filter((request) => request.id !== id)
-            );
-            Alert.alert('Success', 'Adoption request approved.');
-        } catch (error) {
-            console.error('Error accepting adoption request:', error);
-            Alert.alert('Error', 'Could not approve adoption request.');
+  // Fetch adoption requests
+  useEffect(() => {
+    const fetchAdoptionRequests = async () => {
+      setLoading(true);
+      try {
+        const token = await AsyncStorage.getItem('access_token');
+        if (!token) {
+          Alert.alert('Error', 'No token found. Please log in again.');
+          return;
         }
+
+        const response = await axios.get(API_URL, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        const adoptionData = response.data.data.map((adoption: any) => ({
+          id: adoption._id,
+          petName: adoption.pet.name,
+          adopterName: adoption.customer.username,
+          adopterEmail: adoption.customer.email,
+          shelterName: adoption.shelter.name,
+          status: adoption.status,
+        }));
+
+        setRequests(adoptionData);
+      } catch (error) {
+        console.error('Error fetching adoption requests:', error);
+        Alert.alert('Error', 'Could not fetch adoption requests.');
+      } finally {
+        setLoading(false);
+      }
     };
 
-    // Handle Rejecting
-    const handleReject = (id: string) => {
-        setSelectedRequestId(id); // Set the selected request ID
-        setDialogVisible(true); // Show the dialog
-    };
+    fetchAdoptionRequests();
+  }, []);
 
-    const handleConfirmReject = async () => {
-        if (reason) {
-            try {
-                const token = await AsyncStorage.getItem('access_token');
-                if (!token) {
-                    Alert.alert(
-                        'Error',
-                        'No token found. Please log in again.'
-                    );
-                    return;
-                }
-
-                await axios.put(
-                    `${API_URL}${selectedRequestId}`,
-                    {
-                        status: 'rejected',
-                        rejectionReason: reason,
-                    },
-                    {
-                        headers: {
-                            Authorization: `Bearer ${token}`,
-                        },
-                    }
-                );
-
-                setRequests((prevRequests) =>
-                    prevRequests.filter(
-                        (request) => request.id !== selectedRequestId
-                    )
-                );
-                Alert.alert('Success', 'Adoption request rejected.');
-            } catch (error) {
-                console.error('Error rejecting adoption request:', error);
-                Alert.alert('Error', 'Could not reject adoption request.');
-            } finally {
-                setDialogVisible(false);
-                setReason(''); // Reset reason after submission
-                setSelectedRequestId(null); // Clear the selected request ID
-            }
-        }
-    };
-
-    
-     // Handle completing an approved request
+  // Handle completing an approved request
   const handleComplete = async (id: string) => {
     try {
       const token = await AsyncStorage.getItem('access_token');
@@ -191,7 +108,7 @@ export default function ConfirmAdoptionScreen() {
     }
   };
 
-  // Handle Rejecting
+  // Handle rejecting a request
   const handleReject = (id: string) => {
     setSelectedRequestId(id); // Set the selected request ID
     setDialogVisible(true); // Show the dialog
@@ -206,18 +123,14 @@ export default function ConfirmAdoptionScreen() {
           return;
         }
 
-        await axios.put(
-          `${API_URL}${selectedRequestId}`,
-          {
-            status: 'rejected',
-            rejectionReason: reason,
+        await axios.put(`${API_URL}${selectedRequestId}`, {
+          status: 'rejected',
+          rejectionReason: reason,
+        }, {
+          headers: {
+            Authorization: `Bearer ${token}`,
           },
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
+        });
 
         setRequests((prevRequests) => prevRequests.filter((request) => request.id !== selectedRequestId));
         Alert.alert('Success', 'Adoption request rejected.');
@@ -232,15 +145,7 @@ export default function ConfirmAdoptionScreen() {
     } else {
       Alert.alert('Error', 'Please provide a rejection reason.');
     }
-
-
-
-
- 
-
-  
-
- 
+  };
 
   // Toggle modal for filter options
   const toggleModal = () => {
@@ -287,7 +192,8 @@ export default function ConfirmAdoptionScreen() {
       )}
     </View>
   );
-// Filter requests: show based on selected filter
+
+  // Filter requests: show based on selected filter
   const filteredRequests = requests.filter((request) => {
     if (selectedFilter === 'all') return request.status === 'pending' || request.status === 'approved';
     return request.status === selectedFilter;
@@ -302,40 +208,6 @@ export default function ConfirmAdoptionScreen() {
       </View>
     );
   }
-  
-    
-    return (
-        <View style={styles.container}>
-            <Text style={styles.title}>Confirm Adoption Requests</Text>
-            <FlatList
-                data={pendingRequests}
-                keyExtractor={(item) => item.id}
-                renderItem={renderRequestItem}
-            />
-
-            {/* Dialog for rejection reason */}
-            <Dialog.Container visible={dialogVisible}>
-                <Dialog.Title>Reject Adoption Request</Dialog.Title>
-                <Dialog.Description>
-                    Please provide a reason for rejection:
-                </Dialog.Description>
-                <Dialog.Input
-                    label="Reason"
-                    value={reason}
-                    onChangeText={setReason}
-                />
-                <Dialog.Button
-                    label="Cancel"
-                    onPress={() => setDialogVisible(false)}
-                />
-                <Dialog.Button label="Confirm" onPress={handleConfirmReject} />
-            </Dialog.Container>
-        </View>
-    );
-}
-
-
-  
 
   return (
     <View style={styles.container}>
@@ -384,28 +256,23 @@ export default function ConfirmAdoptionScreen() {
         </View>
       </Modal>
 
-      {/* Dialog for reject reason */}
-      <Modal visible={dialogVisible} transparent={true} animationType="fade">
-        <View style={styles.modalContainer}>
-          <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>Provide a reason for rejection</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="Enter rejection reason"
-              value={reason}
-              onChangeText={setReason}
-            />
-            <View style={styles.dialogButtonContainer}>
-              <TouchableOpacity style={styles.modalButton} onPress={handleConfirmReject}>
-                <Text style={styles.buttonText}>Confirm Reject</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.modalCancelButton} onPress={() => setDialogVisible(false)}>
-                <Text style={styles.buttonText}>Cancel</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        </View>
-      </Modal>
+      {/* Dialog for rejecting with reason */}
+      <Dialog.Container visible={dialogVisible}>
+        <Dialog.Title>Reject Adoption Request</Dialog.Title>
+        <Dialog.Description>
+          Please provide a reason for rejection:
+        </Dialog.Description>
+        <Dialog.Input
+          label="Reason"
+          value={reason}
+          onChangeText={setReason}
+        />
+        <Dialog.Button
+          label="Cancel"
+          onPress={() => setDialogVisible(false)}
+        />
+        <Dialog.Button label="Confirm" onPress={handleConfirmReject} />
+      </Dialog.Container>
     </View>
   );
 }
