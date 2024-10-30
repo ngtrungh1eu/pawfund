@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import {
   View,
@@ -113,13 +114,16 @@ export function PetDetailScreen({ route }) {
     );
   };
 
-  if (!pet) {
-    return (
-      <View style={styles.container}>
-        <Text>Loading...</Text>
-      </View>
-    );
-  }
+
+
+   if (!pet) {
+        return (
+            <View style={styles.container}>
+                <Text>Loading...</Text>
+            </View>
+        );
+    }
+    const isFavorite = favorites.includes(petId);
 
   return (
     <ScrollView style={styles.container}>
@@ -303,4 +307,5 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "bold",
   },
+
 });

@@ -7,9 +7,9 @@ import { FavoritesScreen } from '../screens/FavoritesScreen';
 import { ChatScreen } from '../screens/ChatScreen';
 import { ProfileScreen } from '../screens/ProfileScreen';
 import LostFoundForm from '../screens/LostFoundForm';
+import { DashboardScreen } from './../screens/shelter/DashboardScreen';
 
 const Tab = createBottomTabNavigator();
-
 
 export function TabNavigator() {
   return (
@@ -37,13 +37,13 @@ export function TabNavigator() {
         },
       })}
     >
-      <Tab.Screen name="Home" component={HomeScreen} /> 
+      <Tab.Screen name="Home" component={HomeScreen} />
       <Tab.Screen name="Favorites" component={FavoritesScreen} />
 
-        {/* Custom SOS Tab */}
-        <Tab.Screen
+      {/* Custom SOS Tab */}
+      <Tab.Screen
         name="SOS"
-        component={LostFoundForm}
+        component={DashboardScreen}
         options={{
           tabBarIcon: ({ focused }) => (
             <View
@@ -58,15 +58,12 @@ export function TabNavigator() {
                 alignItems: 'center',
               }}
             >
-              <Text style={{ color: '#fff', fontWeight: 'bold', fontSize: 16 }}>
-                SOS
-              </Text>
+              <Text style={{ color: '#fff', fontWeight: 'bold', fontSize: 16 }}>SOS</Text>
             </View>
           ),
-          tabBarLabel: () => null, 
+          tabBarLabel: () => null,
         }}
       />
-
 
       <Tab.Screen name="Chats" component={ChatScreen} />
       <Tab.Screen name="Profile" component={ProfileScreen} />

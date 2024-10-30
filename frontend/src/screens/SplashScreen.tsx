@@ -1,31 +1,35 @@
-import { Image, StyleSheet, View } from "react-native";
-import React, { useEffect } from "react";
+import { Image, StyleSheet, View } from 'react-native';
+import React, { useEffect } from 'react';
 
-import useAuth from "../hooks/useAuth";
-import { useNavigation } from "@react-navigation/native";
+import useAuth from '../hooks/useAuth';
+import { useNavigation } from '@react-navigation/native';
 
 const SplashScreen = () => {
   const navigation = useNavigation();
-  const { isAuthenticated } = useAuth();
-
+  const { isAuthenticated, role } = useAuth();
+  console.log('role', role);
   useEffect(() => {
     const timer = setTimeout(() => {
       // Navigate to the main app after a delay
       if (isAuthenticated) {
-        navigation.navigate("Main" as never);
+        if (role == 'shelter_staff') {
+          navigation.navigate('ResetPassword' as never);
+        } else if (role == 'customer') {
+          navigation.navigate('Main' as never);
+        }
         return;
       } else {
-        navigation.navigate("Login" as never);
+        navigation.navigate('Login' as never);
       }
     }, 2000); // Adjust the delay as needed (2 seconds in this example)
 
     return () => clearTimeout(timer);
-  }, [navigation]);
+  }, [navigation, isAuthenticated, role]);
 
   return (
     <View style={styles.container}>
       <Image
-        source={require("../assets/splash-screen.jpg")}
+        source={require('../assets/splash-screen.jpg')}
         style={styles.logo}
         resizeMode="contain"
       />
@@ -36,9 +40,9 @@ const SplashScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#FFFFFF",
-    justifyContent: "center",
-    alignItems: "center",
+    backgroundColor: '#FFFFFF',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   logo: {
     width: 100,
