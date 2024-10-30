@@ -171,64 +171,159 @@ exports.getAdoption = async (req, res) => {
   }
 };
 
-// Update adoption
+// // Update adoption
+// exports.updateAdoption = async (req, res) => {
+//   try {
+//     // Validate request body
+//     const validatedData = UpdateAdoptionSchema.parse(req.body);
+
+//     // Additional validation for rejection
+//     if (validatedData.status === 'rejected') {
+//       if (!validatedData.rejectionReason) {
+//         throw new Error('Rejection reason is required when rejecting an adoption');
+//       }
+//     }
+
+//     // Add approval date if status is changed to approved
+//     if (validatedData.status === 'approved') {
+//       validatedData.approvalDate = new Date();
+//     }
+
+//     const adoption = await Adoption.findByIdAndUpdate(
+//       req.params.id,
+//       {
+//         ...validatedData,
+//         updatedAt: new Date(),
+//       },
+//       { new: true, runValidators: true }
+//     )
+//       .populate('pet')
+//       .populate('customer')
+//       .populate('shelter');
+
+//     if (!adoption) {
+//       return res.status(404).json({
+//         status: 'error',
+//         message: 'Adoption not found',
+//       });
+//     }
+
+//     res.json({
+//       status: 'success',
+//       data: adoption,
+//     });
+//   } catch (error) {
+//     if (error instanceof z.ZodError) {
+//       return res.status(400).json({
+//         status: 'error',
+//         errors: error.errors.map((err) => ({
+//           field: err.path.join('.'),
+//           message: err.message,
+//         })),
+//       });
+//     }
+
+//     res.status(400).json({
+//       status: 'error',
+//       message: error.message,
+//     });
+//   }
+// };
+
 exports.updateAdoption = async (req, res) => {
   try {
-    // Validate request body
-    const validatedData = UpdateAdoptionSchema.parse(req.body);
+      // Validate request body
+      const validatedData = UpdateAdoptionSchema.parse(req.body);
 
-    // Additional validation for rejection
-    if (validatedData.status === 'rejected') {
-      if (!validatedData.rejectionReason) {
-        throw new Error('Rejection reason is required when rejecting an adoption');
+      // Additional validation for rejection
+      if (validatedData.status === 'rejected') {
+          if (!validatedData.rejectionReason) {
+              throw new Error(
+                  'Rejection reason is required when rejecting an adoption'
+              );
+          }
       }
-    }
 
-    // Add approval date if status is changed to approved
-    if (validatedData.status === 'approved') {
-      validatedData.approvalDate = new Date();
-    }
+      // Add approval date if status is changed to approved
+      if (validatedData.status === 'approved') {
+          validatedData.approvalDate = new Date();
+      }
 
-    const adoption = await Adoption.findByIdAndUpdate(
-      req.params.id,
-      {
-        ...validatedData,
-        updatedAt: new Date(),
-      },
-      { new: true, runValidators: true }
-    )
-      .populate('pet')
-      .populate('customer')
-      .populate('shelter');
+      // Find existing adoption record to check its current status
+      const existingAdoption = await Adoption.findById(req.params.id);
 
-    if (!adoption) {
-      return res.status(404).json({
-        status: 'error',
-        message: 'Adoption not found',
+      if (!existingAdoption) {
+          return res.status(404).json({
+              status: 'error',
+              message: 'Adoption not found',
+          });
+      }
+
+      if (validatedData.status === 'rejected') {
+          // Chỉ cần cập nhật trạng thái thành "rejected" và lý do từ chối
+          await Adoption.findByIdAndUpdate(
+              req.params.id,
+              {
+                  status: 'rejected',
+                  rejectionReason: validatedData.rejectionReason,
+                  updatedAt: new Date(),
+              },
+              { new: true, runValidators: true }
+          );
+
+          // Không cần xóa bản ghi pet ở đây, vì adoption vẫn được lưu
+          return res.json({
+              status: 'success',
+              message: 'Adoption request has been rejected.',
+          });
+      }
+
+      // Nếu không phải "rejected", cập nhật adoption bình thường
+      const adoption = await Adoption.findByIdAndUpdate(
+          req.params.id,
+          {
+              ...validatedData,
+              updatedAt: new Date(),
+          },
+          { new: true, runValidators: true }
+      )
+          .populate('pet')
+          .populate('customer')
+          .populate('shelter');
+
+      // Update pet's adoptionStatus nếu status thay đổi thành "approved"
+      if (
+          existingAdoption.status !== validatedData.status &&
+          validatedData.status === 'approved'
+      ) {
+          await Pet.findByIdAndUpdate(adoption.pet._id, {
+              adoptionStatus: 'adopted',
+          });
+      }
+
+      res.json({
+          status: 'success',
+          data: adoption,
       });
-    }
-
-    res.json({
-      status: 'success',
-      data: adoption,
-    });
   } catch (error) {
-    if (error instanceof z.ZodError) {
-      return res.status(400).json({
-        status: 'error',
-        errors: error.errors.map((err) => ({
-          field: err.path.join('.'),
-          message: err.message,
-        })),
+      console.error('Error details:', error); // Log thêm thông tin lỗi
+      if (error instanceof z.ZodError) {
+          return res.status(400).json({
+              status: 'error',
+              errors: error.errors.map((err) => ({
+                  field: err.path.join('.'),
+                  message: err.message,
+              })),
+          });
+      }
+      res.status(400).json({
+          status: 'error',
+          message: error.message,
       });
-    }
-
-    res.status(400).json({
-      status: 'error',
-      message: error.message,
-    });
   }
 };
+
+
 
 // Delete adoption
 exports.deleteAdoption = async (req, res) => {
