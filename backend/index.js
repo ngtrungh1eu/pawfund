@@ -12,7 +12,7 @@ const shelterRoutes = require('./routes/shelterRoutes');
 const adoptionRoutes = require('./routes/adoptionsRoute');
 const donationRoutes = require('./routes/donationsRoute');
 const eventRoutes = require('./routes/eventsRoute');
-
+const userRoutes = require('./routes/userRoute');
 const { connect } = require('./config/database');
 const app = express();
 
@@ -47,7 +47,7 @@ app.use('/api/shelters', shelterRoutes);
 app.use('/api/adoptions', adoptionRoutes);
 app.use('/api/donations', donationRoutes);
 app.use('/api/events', eventRoutes);
-
+app.use('/api/users', userRoutes);
 // Start server
 app.listen(process.env.PORT, () => {
     console.log(`Server running on port http://localhost:${process.env.PORT}`);

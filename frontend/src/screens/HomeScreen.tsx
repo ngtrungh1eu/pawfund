@@ -116,7 +116,7 @@ export function HomeScreen() {
             </View>
             <TouchableOpacity
                 style={styles.fullWidthCard}
-                onPress={() => navigation.navigate('LostFoundScreen')}
+                onPress={() => navigation.navigate('Events')}
             >
                 <View style={styles.cardContent}>
                     <View style={styles.iconContainer}>
@@ -128,10 +128,10 @@ export function HomeScreen() {
                         />
                     </View>
                     <View style={styles.textContainer}>
-                        <Text style={styles.cardTitle}>Feeds</Text>
-                        <Text style={styles.cardDesfeeds}>
-                            Stay Updated: Your Source for the Latest feeds and
-                            Updates.
+                        <Text style={styles.cardTitle}>Events</Text>
+
+                        <Text style={styles.cardDescription}>
+                            Explore upcoming events and stay involved.
                         </Text>
                     </View>
                 </View>
