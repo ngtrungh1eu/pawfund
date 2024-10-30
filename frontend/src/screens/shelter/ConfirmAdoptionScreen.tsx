@@ -1,64 +1,156 @@
 import React, { useState, useEffect } from 'react';
+
 import { View, Text, TouchableOpacity, StyleSheet, FlatList, Alert, Modal } from 'react-native';
+
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { MaterialIcons } from '@expo/vector-icons'; // For displaying icons
+import { MaterialIcons } from '@expo/vector-icons';
+import Dialog from 'react-native-dialog';
 
 interface AdoptionRequest {
-  id: string;
-  petName: string;
-  adopterName: string;
-  adopterEmail: string;
-  shelterName: string;
-  status: string;
+    id: string;
+    petName: string;
+    adopterName: string;
+    adopterEmail: string;
+    shelterName: string;
+    status: string;
 }
 
 export default function ConfirmAdoptionScreen() {
-  const [requests, setRequests] = useState<AdoptionRequest[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [selectedFilter, setSelectedFilter] = useState<'pending' | 'approved' | 'all'>('all');
-  const [isModalVisible, setModalVisible] = useState(false);
-  const API_URL = 'http://10.0.2.2:8000/api/adoptions/';
 
-  // Fetch adoption requests
-  useEffect(() => {
-    const fetchAdoptionRequests = async () => {
-      setLoading(true);
-      try {
-        const token = await AsyncStorage.getItem('access_token');
-        if (!token) {
-          Alert.alert('Error', 'No token found. Please log in again.');
-          return;
+    const [requests, setRequests] = useState<AdoptionRequest[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [dialogVisible, setDialogVisible] = useState(false); // State for dialog visibility
+    const [selectedRequestId, setSelectedRequestId] = useState<string | null>(
+        null
+    ); // State to store the selected request ID
+    const [reason, setReason] = useState(''); // State to store rejection reason
+    const [selectedFilter, setSelectedFilter] = useState<'pending' | 'approved' | 'all'>('all');
+    const [isModalVisible, setModalVisible] = useState(false);
+    const API_URL = 'http://10.0.2.2:8000/api/adoptions/';
+
+    // Fetch adoption requests
+    useEffect(() => {
+        const fetchAdoptionRequests = async () => {
+            setLoading(true);
+            try {
+                const token = await AsyncStorage.getItem('access_token');
+                if (!token) {
+                    Alert.alert(
+                        'Error',
+                        'No token found. Please log in again.'
+                    );
+                    return;
+                }
+
+                const response = await axios.get(API_URL, {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                });
+
+                const adoptionData = response.data.data.map(
+                    (adoption: any) => ({
+                        id: adoption._id,
+                        petName: adoption.pet.name,
+                        adopterName: adoption.customer.username,
+                        adopterEmail: adoption.customer.email,
+                        shelterName: adoption.shelter.name,
+                        status: adoption.status,
+                    })
+                );
+
+                setRequests(adoptionData);
+            } catch (error) {
+                console.error('Error fetching adoption requests:', error);
+                Alert.alert('Error', 'Could not fetch adoption requests.');
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchAdoptionRequests();
+    }, []);
+
+    // Handle Accepting
+    const handleAccept = async (id: string) => {
+        try {
+            const token = await AsyncStorage.getItem('access_token');
+            if (!token) {
+                Alert.alert('Error', 'No token found. Please log in again.');
+                return;
+            }
+
+            await axios.put(
+                `${API_URL}${id}`,
+                { status: 'approved' },
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                }
+            );
+
+            setRequests((prevRequests) =>
+                prevRequests.filter((request) => request.id !== id)
+            );
+            Alert.alert('Success', 'Adoption request approved.');
+        } catch (error) {
+            console.error('Error accepting adoption request:', error);
+            Alert.alert('Error', 'Could not approve adoption request.');
         }
-
-        const response = await axios.get(API_URL, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-
-        const adoptionData = response.data.data.map((adoption: any) => ({
-          id: adoption._id,
-          petName: adoption.pet.name,
-          adopterName: adoption.customer.username,
-          adopterEmail: adoption.customer.email,
-          shelterName: adoption.shelter.name,
-          status: adoption.status,
-        }));
-
-        setRequests(adoptionData);
-      } catch (error) {
-        console.error('Error fetching adoption requests:', error);
-        Alert.alert('Error', 'Could not fetch adoption requests.');
-      } finally {
-        setLoading(false);
-      }
     };
 
-    fetchAdoptionRequests();
-  }, []);
+    // Handle Rejecting
+    const handleReject = (id: string) => {
+        setSelectedRequestId(id); // Set the selected request ID
+        setDialogVisible(true); // Show the dialog
+    };
 
-  // Handle completing an approved request
+    const handleConfirmReject = async () => {
+        if (reason) {
+            try {
+                const token = await AsyncStorage.getItem('access_token');
+                if (!token) {
+                    Alert.alert(
+                        'Error',
+                        'No token found. Please log in again.'
+                    );
+                    return;
+                }
+
+                await axios.put(
+                    `${API_URL}${selectedRequestId}`,
+                    {
+                        status: 'rejected',
+                        rejectionReason: reason,
+                    },
+                    {
+                        headers: {
+                            Authorization: `Bearer ${token}`,
+                        },
+                    }
+                );
+
+                setRequests((prevRequests) =>
+                    prevRequests.filter(
+                        (request) => request.id !== selectedRequestId
+                    )
+                );
+                Alert.alert('Success', 'Adoption request rejected.');
+            } catch (error) {
+                console.error('Error rejecting adoption request:', error);
+                Alert.alert('Error', 'Could not reject adoption request.');
+            } finally {
+                setDialogVisible(false);
+                setReason(''); // Reset reason after submission
+                setSelectedRequestId(null); // Clear the selected request ID
+            }
+        }
+    };
+
+    
+     // Handle completing an approved request
   const handleComplete = async (id: string) => {
     try {
       const token = await AsyncStorage.getItem('access_token');
@@ -80,52 +172,66 @@ export default function ConfirmAdoptionScreen() {
       Alert.alert('Error', 'Could not mark adoption as completed.');
     }
   };
+    
+    
+    const renderRequestItem = ({ item }: { item: AdoptionRequest }) => (
+        <View style={styles.card}>
+            <Text style={styles.petName}>Pet Name: {item.petName}</Text>
+            <Text>Adopter Name: {item.adopterName}</Text>
+            <Text>Adopter Email: {item.adopterEmail}</Text>
+            <Text>Shelter: {item.shelterName}</Text>
 
-  // Handle accepting a pending request
-  const handleAccept = async (id: string) => {
-    try {
-      const token = await AsyncStorage.getItem('access_token');
-      if (!token) {
-        Alert.alert('Error', 'No token found. Please log in again.');
-        return;
-      }
+            <View style={styles.buttonContainer}>
+                <TouchableOpacity
+                    style={styles.acceptButton}
+                    onPress={() => handleAccept(item.id)}
+                >
+                    <Text style={styles.buttonText}>Accept</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                    style={styles.rejectButton}
+                    onPress={() => handleReject(item.id)}
+                >
+                    <Text style={styles.buttonText}>Reject</Text>
+                </TouchableOpacity>
+            </View>
+        </View>
+    );
 
-      await axios.put(`${API_URL}${id}`, { status: 'approved' }, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      setRequests((prevRequests) => prevRequests.filter((request) => request.id !== id));
-      Alert.alert('Success', 'Adoption request approved.');
-    } catch (error) {
-      console.error('Error accepting adoption request:', error);
-      Alert.alert('Error', 'Could not approve adoption request.');
+    // Show loading
+    if (loading) {
+        return (
+            <View style={styles.container}>
+                <Text>Loading...</Text>
+            </View>
+        );
     }
-  };
 
-  // Handle rejecting a pending request
-  const handleReject = async (id: string) => {
-    try {
-      const token = await AsyncStorage.getItem('access_token');
-      if (!token) {
-        Alert.alert('Error', 'No token found. Please log in again.');
-        return;
-      }
+    // Filter requests with status 'pending'
+  const pendingRequests = requests.filter(
+        (request) => request.status === 'pending'
+    );
 
-      await axios.put(`${API_URL}${id}`, { status: 'rejected' }, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
 
-      setRequests((prevRequests) => prevRequests.filter((request) => request.id !== id));
-      Alert.alert('Success', 'Adoption request rejected.');
-    } catch (error) {
-      console.error('Error rejecting adoption request:', error);
-      Alert.alert('Error', 'Could not reject adoption request.');
+  if (pendingRequests.length === 0) {
+        return (
+            <View style={styles.noDataContainer}>
+                <MaterialIcons name="hourglass-empty" size={50} color="gray" />
+                <Text style={styles.noDataText}>
+                    No Pending Adoption Requests Available
+                </Text>
+            </View>
+        );
     }
-  };
+
+
+
+
+ 
+
+  
+
+ 
 
   // Toggle modal for filter options
   const toggleModal = () => {
@@ -172,17 +278,7 @@ export default function ConfirmAdoptionScreen() {
       )}
     </View>
   );
-
-  // Show loading
-  if (loading) {
-    return (
-      <View style={styles.container}>
-        <Text>Loading...</Text>
-      </View>
-    );
-  }
-
-  // Filter requests: show based on selected filter
+// Filter requests: show based on selected filter
   const filteredRequests = requests.filter((request) => {
     if (selectedFilter === 'all') return request.status === 'pending' || request.status === 'approved';
     return request.status === selectedFilter;
@@ -197,6 +293,40 @@ export default function ConfirmAdoptionScreen() {
       </View>
     );
   }
+  
+    
+    return (
+        <View style={styles.container}>
+            <Text style={styles.title}>Confirm Adoption Requests</Text>
+            <FlatList
+                data={pendingRequests}
+                keyExtractor={(item) => item.id}
+                renderItem={renderRequestItem}
+            />
+
+            {/* Dialog for rejection reason */}
+            <Dialog.Container visible={dialogVisible}>
+                <Dialog.Title>Reject Adoption Request</Dialog.Title>
+                <Dialog.Description>
+                    Please provide a reason for rejection:
+                </Dialog.Description>
+                <Dialog.Input
+                    label="Reason"
+                    value={reason}
+                    onChangeText={setReason}
+                />
+                <Dialog.Button
+                    label="Cancel"
+                    onPress={() => setDialogVisible(false)}
+                />
+                <Dialog.Button label="Confirm" onPress={handleConfirmReject} />
+            </Dialog.Container>
+        </View>
+    );
+}
+
+
+  
 
   return (
     <View style={styles.container}>
@@ -353,4 +483,5 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     alignItems: 'center',
   },
+
 });
