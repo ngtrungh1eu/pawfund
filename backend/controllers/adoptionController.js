@@ -1,5 +1,9 @@
 const { z } = require('zod');
 const Adoption = require('../models/Adoption');
+const Pet = require('../models/Pet');
+const User = require('../models/User');
+const Shelter = require('../models/Shelter');
+const mongoose = require('mongoose');
 
 // Zod schemas
 const AdoptionSchema = z.object({
@@ -34,6 +38,29 @@ exports.createAdoption = async (req, res) => {
       applicationDate: new Date(),
       status: 'pending',
     });
+
+    const shelter = await Shelter.findById(validatedData.shelter);
+    if (!shelter) {
+      return res.status(400).json({
+        status: 'error',
+        message: 'Shelter does not exist.',
+      });
+    }
+
+    const pet = await Pet.findById(validatedData.pet);
+    if (!pet) {
+      return res.status(400).json({
+        status: 'error',
+        message: 'Pet does not exist.',
+      });
+    }
+
+    if (!shelter.pets.includes(pet._id)) {
+      return res.status(400).json({
+        status: 'error',
+        message: 'Pet is not in the specified shelter.',
+      });
+    }
 
     await Pet.findByIdAndUpdate(validatedData.pet, { adoptionStatus: validatedData.status });
 
