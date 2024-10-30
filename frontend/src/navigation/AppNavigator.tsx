@@ -5,7 +5,7 @@ import DonatedTransactionDetails from '../screens/DonatedTransactionDetailsScree
 import ForgotPasswordScreen from '../screens/ForgotPasswordScreen';
 import { HomeScreen } from '../screens/HomeScreen';
 import LoginScreen from '../screens/LoginScreen';
-import { NavigationContainer } from '@react-navigation/native';
+
 import NoChat from '../screens/NoChatScreen';
 import NoNotifications from '../screens/NoNotificationsScreen';
 import Notifications from '../screens/NotificationsScreen';
@@ -21,7 +21,8 @@ import SystemSettingsScreen from '../screens/SystemSettingsScreen';
 import UPISetting from '../screens/UPISettingScreen';
 import VerifyUPISetting from '../screens/VerifyUPISettingScreen';
 import { createStackNavigator } from '@react-navigation/stack';
-import useAuth from '../hooks/useAuth';
+// import useAuth from '../hooks/useAuth';
+
 import { TabNavigator } from './TabNavigator';
 import LostFoundScreen from '../screens/LostFoundScreen';
 import { AdoptPetScreen } from '../screens/AdoptPetScreen';
@@ -34,6 +35,7 @@ import ConfirmAdoptionScreen from './../screens/shelter/ConfirmAdoptionScreen';
 import { AdoptionHistoryScreen } from '../screens/shelter/AdoptionHistoryScreen';
 import { EventsScreen } from '../screens/EventsScreen';
 import EventDetailScreen from '../screens/EventDetailScreen';
+import { useAuth } from '../context/AuthProvider';
 
 const Stack = createStackNavigator();
 
@@ -41,7 +43,7 @@ const AppNavigator = () => {
     const { isAuthenticated } = useAuth();
 
     return (
-        <NavigationContainer>
+        <>
             <Stack.Navigator initialRouteName="Splash">
                 <Stack.Screen
                     name="Splash"
@@ -207,7 +209,7 @@ const AppNavigator = () => {
                     </>
                 )}
             </Stack.Navigator>
-        </NavigationContainer>
+        </>
     );
 };
 
