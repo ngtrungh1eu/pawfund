@@ -1,5 +1,7 @@
 const { z } = require('zod');
 const Pet = require('../models/Pet');
+const mongoose = require('mongoose');
+const Shelter = require('../models/Shelter');
 
 // Zod schemas
 const PetSchema = z.object({
@@ -47,8 +49,8 @@ exports.createPet = async (req, res) => {
     });
 
     await pet.save();
-
     const populatedPet = await Pet.findById(pet._id).populate('shelter');
+    await Shelter.findByIdAndUpdate(validatedData.shelter, { $push: { pets: pet._id } });
 
     res.status(201).json({
       status: 'success',
@@ -224,6 +226,7 @@ exports.deletePet = async (req, res) => {
         message: 'Pet not found',
       });
     }
+    await Shelter.findByIdAndUpdate(pet.shelter, { $pull: { pets: pet._id } });
 
     res.json({
       status: 'success',
