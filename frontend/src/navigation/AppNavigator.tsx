@@ -36,6 +36,7 @@ import { EventsScreen } from "../screens/EventsScreen";
 import EventDetailScreen from "../screens/EventDetailScreen";
 import PetHistoryScreen from "../screens/PetHistoryScreen";
 
+
 const Stack = createStackNavigator();
 
 const AppNavigator = () => {
@@ -212,6 +213,7 @@ const AppNavigator = () => {
       </Stack.Navigator>
     </NavigationContainer>
   );
+
 };
 
 export default AppNavigator;

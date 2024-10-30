@@ -1,19 +1,20 @@
 import React, { useEffect, useState } from "react";
 import {
-  View,
-  Text,
-  StyleSheet,
-  Image,
-  TouchableOpacity,
-  ScrollView,
-  Alert,
-} from "react-native";
-import { FontAwesome, Ionicons } from "@expo/vector-icons";
-import useAuth from "../hooks/useAuth";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import axios from "axios";
-import { useFocusEffect, useNavigation } from "@react-navigation/native";
 
+    View,
+    Text,
+    StyleSheet,
+    Image,
+    TouchableOpacity,
+    ScrollView,
+    Alert,
+} from 'react-native';
+import { FontAwesome, Ionicons } from '@expo/vector-icons';
+// import useAuth from '../hooks/useAuth';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
+import { useAuth } from '../context/AuthProvider';
 type UserProfile = {
   _id: string;
   username: string;
