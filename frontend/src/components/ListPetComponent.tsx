@@ -9,11 +9,13 @@ import {
 } from "react-native";
 import { PetCard } from "./PetCard"; // Importing the PetCard component
 import { useNavigation } from "@react-navigation/native";
+import { usePetContext } from "../utils/PetContext";
 
 export function ListPetComponent({ pets }) {
   const [selectedBreed, setSelectedBreed] = useState<string>("All");
   const [showMore, setShowMore] = useState(false);
   const navigation = useNavigation();
+  const { favorites, toggleFavorite } = usePetContext();
 
   // Extract unique breeds from the pet data
   const uniqueBreeds = Array.from(new Set(pets.map((pet) => pet.breed)));
@@ -69,6 +71,8 @@ export function ListPetComponent({ pets }) {
             name={item.name}
             breed={item.breed}
             image={item.images[0]}
+            isFavorite={favorites.includes(item._id)}
+            onFavoriteToggle={() => toggleFavorite(item._id)}
             onPress={() =>
               navigation.navigate("PetDetailScreen", { petId: item._id })
             }
