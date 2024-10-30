@@ -232,6 +232,8 @@ exports.deleteShelter = async (req, res) => {
       });
     }
 
+    await Pet.updateMany({ shelter: id }, { $unset: { shelter: '' } });
+
     await shelter.deleteOne();
     res.json({ message: 'Đã xóa shelter thành công' });
   } catch (error) {

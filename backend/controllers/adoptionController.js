@@ -35,6 +35,8 @@ exports.createAdoption = async (req, res) => {
       status: 'pending',
     });
 
+    await Pet.findByIdAndUpdate(validatedData.pet, { adoptionStatus: validatedData.status });
+
     await adoption.save();
 
     const populatedAdoption = await Adoption.findById(adoption._id)
@@ -212,6 +214,8 @@ exports.deleteAdoption = async (req, res) => {
         message: 'Adoption not found',
       });
     }
+
+    await Pet.findByIdAndUpdate(adoption.pet, { adoptionStatus: 'available' });
 
     res.json({
       status: 'success',
