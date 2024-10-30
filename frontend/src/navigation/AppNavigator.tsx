@@ -28,6 +28,12 @@ import { AdoptPetScreen } from '../screens/AdoptPetScreen';
 import LostFoundForm from '../screens/LostFoundForm';
 import { PetDetailScreen } from '../screens/PetDetailScreen';
 import ProfileInfoScreen from '../screens/ProfileInfoScreen';
+import { DashboardScreen } from './../screens/shelter/DashboardScreen';
+import { RegisterAnimalScreen } from './../screens/shelter/RegisterAnimalScreen';
+import ConfirmAdoptionScreen from './../screens/shelter/ConfirmAdoptionScreen';
+import { AdoptionHistoryScreen } from '../screens/shelter/AdoptionHistoryScreen';
+import { EventsScreen } from '../screens/EventsScreen';
+import EventDetailScreen from '../screens/EventDetailScreen';
 
 const Stack = createStackNavigator();
 
@@ -45,14 +51,14 @@ const AppNavigator = () => {
                 {isAuthenticated ? (
                     <>
                         <Stack.Screen
-                            name="Home"
-                            component={HomeScreen}
-                            options={{ headerShown: true }}
-                        />
-                        <Stack.Screen
                             name="Main"
                             component={TabNavigator}
                             options={{ headerShown: false }}
+                        />
+                        <Stack.Screen
+                            name="Home"
+                            component={HomeScreen}
+                            options={{ headerShown: true }}
                         />
                         <Stack.Screen
                             name="Lost and Found"
@@ -93,6 +99,16 @@ const AppNavigator = () => {
                             name="ResetPassword"
                             component={ResetPasswordScreen}
                             options={{ headerShown: false }}
+                        />
+                        <Stack.Screen
+                            name="Events"
+                            component={EventsScreen}
+                            options={{ headerShown: true }}
+                        />
+                        <Stack.Screen
+                            name="EventDetail"
+                            component={EventDetailScreen}
+                            options={{ headerShown: true }}
                         />
                         <Stack.Screen
                             name="AppTheme"
@@ -153,6 +169,22 @@ const AppNavigator = () => {
                             name="NoChat"
                             component={NoChat}
                             options={{ headerShown: false }}
+                        />
+                        <Stack.Screen
+                            name="Dashboard"
+                            component={DashboardScreen}
+                        />
+                        <Stack.Screen
+                            name="Register Animal"
+                            component={RegisterAnimalScreen}
+                        />
+                        <Stack.Screen
+                            name="Confirm Adoption"
+                            component={ConfirmAdoptionScreen}
+                        />
+                        <Stack.Screen
+                            name="Adoption History"
+                            component={AdoptionHistoryScreen}
                         />
                     </>
                 ) : (

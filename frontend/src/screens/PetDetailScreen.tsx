@@ -1,21 +1,19 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect } from 'react';
 import {
-  View,
-  Text,
-  StyleSheet,
-  Image,
-  TouchableOpacity,
-  ScrollView,
-  Alert,
-} from "react-native";
-import { FontAwesome } from "@expo/vector-icons";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import axios from "axios";
+    View,
+    Text,
+    StyleSheet,
+    Image,
+    TouchableOpacity,
+    ScrollView,
+} from 'react-native';
+import { FontAwesome } from '@expo/vector-icons';
+import { usePetContext } from '../utils/PetContext';
 
 export function PetDetailScreen({ route }) {
-  const [pet, setPet] = useState(null);
-  const [isFavorite, setIsFavorite] = useState(false);
-  const { petId } = route.params;
+    const [pet, setPet] = useState(null);
+    const { favorites, toggleFavorite } = usePetContext();
+    const { petId } = route.params;
 
   useEffect(() => {
     const fetchPetDetail = async () => {
@@ -89,25 +87,108 @@ export function PetDetailScreen({ route }) {
                 "Success",
                 "Your adoption request has been submitted!"
               );
-            } catch (error) {
-              console.error("Error submitting adoption request:", error);
-              Alert.alert(
-                "Error",
-                "There was an issue submitting your adoption request."
-              );
             }
-          },
-        },
-      ]
-    );
-  };
+   
 
-  if (!pet) {
+    // Return loading indicator if pet data is not yet loaded
+    if (!pet) {
+        return (
+            <View style={styles.container}>
+                <Text>Loading...</Text>
+            </View>
+        );
+    }
+    const isFavorite = favorites.includes(petId);
     return (
-      <View style={styles.container}>
-        <Text>Loading...</Text>
-      </View>
+        <ScrollView style={styles.container}>
+            {/* Pet Image */}
+            <Image source={{ uri: pet.images[0] }} style={styles.petImage} />
+
+            {/* Pet Name and Heart Icon */}
+            <View style={styles.header}>
+                <View style={styles.nameAddressContainer}>
+                    <Text style={styles.petName}>{pet.name}</Text>
+                    <Text style={styles.petAddress}>{pet.address}</Text>
+                </View>
+                <TouchableOpacity onPress={() => toggleFavorite(petId)}>
+                    <FontAwesome
+                        name={isFavorite ? 'heart' : 'heart-o'}
+                        size={30}
+                        color={isFavorite ? 'red' : '#16A99F'}
+                    />
+                </TouchableOpacity>
+            </View>
+
+            <View style={styles.infoCardsContainer}>
+                <View style={styles.row}>
+                    <View style={styles.infoCard}>
+                        <FontAwesome
+                            name="birthday-cake"
+                            size={24}
+                            color="#16A99F"
+                        />
+                        <Text style={styles.infoText}>{pet.age} years</Text>
+                    </View>
+                    <View style={styles.infoCard}>
+                        <FontAwesome name="paw" size={24} color="#16A99F" />
+                        <Text style={styles.infoText}>{pet.breed}</Text>
+                    </View>
+                </View>
+
+                <View style={styles.row}>
+                    <View style={styles.infoCard}>
+                        <FontAwesome
+                            name="venus-mars"
+                            size={24}
+                            color="#16A99F"
+                        />
+                        <Text style={styles.infoText}>{pet.gender}</Text>
+                    </View>
+                    <View style={styles.infoCard}>
+                        <FontAwesome
+                            name="balance-scale"
+                            size={24}
+                            color="#16A99F"
+                        />
+                        <Text style={styles.infoText}>{pet.size}</Text>
+                        {/* Updated from weight to size */}
+                    </View>
+                </View>
+            </View>
+
+            {/* Pet Description */}
+            <Text style={styles.descriptionTitle}>About {pet.name}</Text>
+            <Text style={styles.descriptionText}>{pet.description}</Text>
+
+            {/* Owner Info */}
+            <View style={styles.ownerInfoCard}>
+                <View style={styles.ownerContainer}>
+                    <Image
+                        source={{ uri: pet.ownerAvatar }}
+                        style={styles.ownerAvatar}
+                    />
+                    {/* Updated from avatar to ownerAvatar */}
+                    <Text style={styles.ownerText}>Owner: {pet.owner}</Text>
+                </View>
+
+                {/* Icons for Phone and Message */}
+                <View style={styles.iconContainer}>
+                    <TouchableOpacity style={styles.iconWrapper}>
+                        <FontAwesome name="phone" size={24} color="#16A99F" />
+                    </TouchableOpacity>
+
+                    <TouchableOpacity style={styles.iconWrapper}>
+                        <FontAwesome
+                            name="envelope"
+                            size={24}
+                            color="#16A99F"
+                        />
+                    </TouchableOpacity>
+                </View>
+            </View>
+        </ScrollView>
     );
+
   }
 
   return (
@@ -271,4 +352,5 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "bold",
   },
+
 });
