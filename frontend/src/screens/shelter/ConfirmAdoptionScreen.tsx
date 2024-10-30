@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, FlatList, Alert, Modal } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, FlatList, Alert, Modal, TextInput } from 'react-native';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { MaterialIcons } from '@expo/vector-icons'; // For displaying icons
@@ -18,6 +18,9 @@ export default function ConfirmAdoptionScreen() {
   const [loading, setLoading] = useState(true);
   const [selectedFilter, setSelectedFilter] = useState<'pending' | 'approved' | 'all'>('all');
   const [isModalVisible, setModalVisible] = useState(false);
+  const [selectedRequestId, setSelectedRequestId] = useState<string | null>(null);
+  const [dialogVisible, setDialogVisible] = useState(false);
+  const [reason, setReason] = useState('');
   const API_URL = 'http://10.0.2.2:8000/api/adoptions/';
 
   // Fetch adoption requests
@@ -104,26 +107,46 @@ export default function ConfirmAdoptionScreen() {
     }
   };
 
-  // Handle rejecting a pending request
-  const handleReject = async (id: string) => {
-    try {
-      const token = await AsyncStorage.getItem('access_token');
-      if (!token) {
-        Alert.alert('Error', 'No token found. Please log in again.');
-        return;
+  // Handle Rejecting
+  const handleReject = (id: string) => {
+    setSelectedRequestId(id); // Set the selected request ID
+    setDialogVisible(true); // Show the dialog
+  };
+
+  const handleConfirmReject = async () => {
+    if (reason) {
+      try {
+        const token = await AsyncStorage.getItem('access_token');
+        if (!token) {
+          Alert.alert('Error', 'No token found. Please log in again.');
+          return;
+        }
+
+        await axios.put(
+          `${API_URL}${selectedRequestId}`,
+          {
+            status: 'rejected',
+            rejectionReason: reason,
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        setRequests((prevRequests) => prevRequests.filter((request) => request.id !== selectedRequestId));
+        Alert.alert('Success', 'Adoption request rejected.');
+      } catch (error) {
+        console.error('Error rejecting adoption request:', error);
+        Alert.alert('Error', 'Could not reject adoption request.');
+      } finally {
+        setDialogVisible(false);
+        setReason(''); // Reset reason after submission
+        setSelectedRequestId(null); // Clear the selected request ID
       }
-
-      await axios.put(`${API_URL}${id}`, { status: 'rejected' }, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      setRequests((prevRequests) => prevRequests.filter((request) => request.id !== id));
-      Alert.alert('Success', 'Adoption request rejected.');
-    } catch (error) {
-      console.error('Error rejecting adoption request:', error);
-      Alert.alert('Error', 'Could not reject adoption request.');
+    } else {
+      Alert.alert('Error', 'Please provide a rejection reason.');
     }
   };
 
@@ -244,6 +267,29 @@ export default function ConfirmAdoptionScreen() {
           </View>
         </View>
       </Modal>
+
+      {/* Dialog for reject reason */}
+      <Modal visible={dialogVisible} transparent={true} animationType="fade">
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>Provide a reason for rejection</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Enter rejection reason"
+              value={reason}
+              onChangeText={setReason}
+            />
+            <View style={styles.dialogButtonContainer}>
+              <TouchableOpacity style={styles.modalButton} onPress={handleConfirmReject}>
+                <Text style={styles.buttonText}>Confirm Reject</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.modalCancelButton} onPress={() => setDialogVisible(false)}>
+                <Text style={styles.buttonText}>Cancel</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 }
@@ -352,5 +398,17 @@ const styles = StyleSheet.create({
     backgroundColor: '#f44336',
     borderRadius: 8,
     alignItems: 'center',
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: '#ddd',
+    padding: 10,
+    borderRadius: 8,
+    marginBottom: 10,
+    textAlign: 'center',
+  },
+  dialogButtonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
   },
 });
