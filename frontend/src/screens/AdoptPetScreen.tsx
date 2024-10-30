@@ -13,7 +13,15 @@ export function AdoptPetScreen() {
       try {
         const response = await fetch("http://10.0.2.2:8000/api/pets/");
         const data = await response.json();
-        setPets(data);
+
+        // Check if data is directly an array or nested within a data property
+        if (Array.isArray(data)) {
+          setPets(data);
+        } else if (Array.isArray(data.data)) {
+          setPets(data.data);
+        } else {
+          console.error("Unexpected data format:", data);
+        }
       } catch (error) {
         console.error("Error fetching pets:", error);
       } finally {
@@ -35,7 +43,11 @@ export function AdoptPetScreen() {
   return (
     <View style={styles.container}>
       <Text style={styles.heading}>Available for Adoption</Text>
-      <ListPetComponent pets={pets} />
+      {Array.isArray(pets) && pets.length > 0 ? (
+        <ListPetComponent pets={pets} />
+      ) : (
+        <Text style={styles.errorText}>No pets available for adoption.</Text>
+      )}
     </View>
   );
 }
@@ -57,5 +69,9 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     textAlign: "center",
     marginBottom: 20,
+  },
+  errorText: {
+    textAlign: "center",
+    color: "red",
   },
 });
