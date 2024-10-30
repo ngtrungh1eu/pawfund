@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, FlatList } from 'react-native';
-
+import { useAuth } from '../../context/AuthProvider';
 // Example staff data
 const staffData = [
   { id: '1', name: 'John Doe', role: 'Shelter Manager' },
@@ -16,6 +16,12 @@ const stats = {
 };
 
 export function DashboardScreen({ navigation }: any) {
+  const { logout } = useAuth();
+   // Handle Log Out action
+   const handleLogout = async () => {
+    await logout(); // Gọi hàm logout từ context
+    navigation.navigate('Login' as never); // Điều hướng đến màn hình đăng nhập
+}
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Dashboard</Text>
@@ -72,6 +78,13 @@ export function DashboardScreen({ navigation }: any) {
           </View>
         )}
       />
+        {/* Log Out Button */}
+        <TouchableOpacity
+                style={styles.logoutButton}
+                onPress={handleLogout}
+            >
+                <Text style={styles.logoutButtonText}>Log Out</Text>
+            </TouchableOpacity>
     </View>
   );
 }
@@ -154,4 +167,16 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#555',
   },
+  logoutButton: {
+    backgroundColor: '#16A99F1A',
+    borderRadius: 10,
+    padding: 15,
+    alignItems: 'center',
+    marginTop: 20,
+},
+logoutButtonText: {
+    color: '#16A99F',
+    fontSize: 18,
+    fontWeight: 'bold',
+},
 });
