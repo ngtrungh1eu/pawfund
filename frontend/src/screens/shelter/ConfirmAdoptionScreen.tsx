@@ -1,28 +1,8 @@
-import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, FlatList } from 'react-native';
-
-const adoptionRequests = [
-  {
-    id: '1',
-    petName: 'Buddy',
-    adopterName: 'John Doe',
-    adopterEmail: 'johndoe@example.com',
-    shelterName: 'Happy Paws Shelter',
-    adoptionFee: 150,
-    notes: 'Looking forward to taking care of Buddy!',
-    status: 'pending',
-  },
-  {
-    id: '2',
-    petName: 'Mittens',
-    adopterName: 'Jane Smith',
-    adopterEmail: 'janesmith@example.com',
-    shelterName: 'Furry Friends Shelter',
-    adoptionFee: 200,
-    notes: 'I have a great home for Mittens!',
-    status: 'pending',
-  },
-];
+import React, { useState, useEffect } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, FlatList, Alert } from 'react-native';
+import axios from 'axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { MaterialIcons } from '@expo/vector-icons'; // For displaying icons
 
 interface AdoptionRequest {
   id: string;
@@ -30,30 +10,98 @@ interface AdoptionRequest {
   adopterName: string;
   adopterEmail: string;
   shelterName: string;
-  adoptionFee: number;
-  notes: string;
   status: string;
 }
 
 export default function ConfirmAdoptionScreen() {
-  const [requests, setRequests] = useState<AdoptionRequest[]>(adoptionRequests);
+  const [requests, setRequests] = useState<AdoptionRequest[]>([]);
+  const [loading, setLoading] = useState(true); 
+  const API_URL = 'http://10.0.2.2:8000/api/adoptions/';
 
-  const handleAccept = (id: string) => {
-    // Xử lý chấp nhận yêu cầu
-    setRequests((prevRequests) =>
-      prevRequests.map((request) =>
-        request.id === id ? { ...request, status: 'accepted' } : request
-      )
-    );
+  // Fetch adoption requests 
+  useEffect(() => {
+    const fetchAdoptionRequests = async () => {
+      setLoading(true); 
+      try {
+        const token = await AsyncStorage.getItem('access_token'); 
+        if (!token) {
+          Alert.alert('Error', 'No token found. Please log in again.');
+          return;
+        }
+  
+        const response = await axios.get(API_URL, {
+          headers: {
+            Authorization: `Bearer ${token}`, 
+          },
+        });
+  
+        const adoptionData = response.data.data.map((adoption: any) => ({
+          id: adoption._id,
+          petName: adoption.pet.name,
+          adopterName: adoption.customer.username,
+          adopterEmail: adoption.customer.email,
+          shelterName: adoption.shelter.name,
+  
+          status: adoption.status,
+        }));
+  
+        setRequests(adoptionData);
+      } catch (error) {
+        console.error('Error fetching adoption requests:', error);
+        Alert.alert('Error', 'Could not fetch adoption requests.');
+      } finally {
+        setLoading(false); 
+      }
+    };
+  
+    fetchAdoptionRequests();
+  }, []);
+  
+
+  // Handle Accepting 
+  const handleAccept = async (id: string) => {
+    try {
+      const token = await AsyncStorage.getItem('access_token');
+      if (!token) {
+        Alert.alert('Error', 'No token found. Please log in again.');
+        return;
+      }
+
+      await axios.put(`${API_URL}${id}`, { status: 'approved' }, {
+        headers: {
+          Authorization: `Bearer ${token}`, 
+        },
+      });
+
+      setRequests((prevRequests) => prevRequests.filter((request) => request.id !== id)); 
+      Alert.alert('Success', 'Adoption request approved.');
+    } catch (error) {
+      console.error('Error accepting adoption request:', error);
+      Alert.alert('Error', 'Could not approve adoption request.');
+    }
   };
 
-  const handleReject = (id: string) => {
-    // Xử lý từ chối yêu cầu
-    setRequests((prevRequests) =>
-      prevRequests.map((request) =>
-        request.id === id ? { ...request, status: 'rejected' } : request
-      )
-    );
+  // Handle Rejecting 
+  const handleReject = async (id: string) => {
+    try {
+      const token = await AsyncStorage.getItem('access_token');
+      if (!token) {
+        Alert.alert('Error', 'No token found. Please log in again.');
+        return;
+      }
+
+      await axios.put(`${API_URL}${id}`, { status: 'rejected' }, {
+        headers: {
+          Authorization: `Bearer ${token}`, 
+        },
+      });
+
+      setRequests((prevRequests) => prevRequests.filter((request) => request.id !== id)); 
+      Alert.alert('Success', 'Adoption request rejected.');
+    } catch (error) {
+      console.error('Error rejecting adoption request:', error);
+      Alert.alert('Error', 'Could not reject adoption request.');
+    }
   };
 
   const renderRequestItem = ({ item }: { item: AdoptionRequest }) => (
@@ -62,8 +110,8 @@ export default function ConfirmAdoptionScreen() {
       <Text>Adopter Name: {item.adopterName}</Text>
       <Text>Adopter Email: {item.adopterEmail}</Text>
       <Text>Shelter: {item.shelterName}</Text>
-      <Text>Adoption Fee: ${item.adoptionFee}</Text>
-      <Text>Notes: {item.notes}</Text>
+
+      
       <View style={styles.buttonContainer}>
         <TouchableOpacity
           style={styles.acceptButton}
@@ -78,17 +126,36 @@ export default function ConfirmAdoptionScreen() {
           <Text style={styles.buttonText}>Reject</Text>
         </TouchableOpacity>
       </View>
-      <Text style={styles.statusText}>
-        Status: {item.status === 'pending' ? 'Pending' : item.status}
-      </Text>
     </View>
   );
+
+  // Show loading 
+  if (loading) {
+    return (
+      <View style={styles.container}>
+        <Text>Loading...</Text>
+      </View>
+    );
+  }
+
+  // Filter requests with status 'pending'
+  const pendingRequests = requests.filter(request => request.status === 'pending');
+
+  // Show "No Data" message if there are no pending requests
+  if (pendingRequests.length === 0) {
+    return (
+      <View style={styles.noDataContainer}>
+        <MaterialIcons name="hourglass-empty" size={50} color="gray" />
+        <Text style={styles.noDataText}>No Pending Adoption Requests Available</Text>
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Confirm Adoption Requests</Text>
       <FlatList
-        data={requests}
+        data={pendingRequests}
         keyExtractor={(item) => item.id}
         renderItem={renderRequestItem}
       />
@@ -149,9 +216,14 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontWeight: 'bold',
   },
-  statusText: {
+  noDataContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  noDataText: {
+    fontSize: 18,
     marginTop: 10,
-    color: '#555',
-    fontStyle: 'italic',
+    color: 'gray',
   },
 });
