@@ -12,8 +12,10 @@ import { FontAwesome } from "@expo/vector-icons";
 import { usePetContext } from "../utils/PetContext";
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+
 export function PetDetailScreen({ route }) {
   const [pet, setPet] = useState(null);
+  const [isAdopted, setIsAdopted] = useState(false);
   const { favorites, toggleFavorite } = usePetContext();
   const { petId } = route.params;
 
@@ -27,6 +29,31 @@ export function PetDetailScreen({ route }) {
         console.log("Pet details fetched successfully:", data);
 
         setPet(data.data);
+
+        // Check if the pet has any active adoption requests
+        const adoptionResponse = await axios.get(
+          `http://10.0.2.2:8000/api/adoptions/`,
+          {
+            headers: {
+              Authorization: `Bearer ${await AsyncStorage.getItem(
+                "access_token"
+              )}`,
+            },
+          }
+        );
+
+        // Filter adoption requests by pet ID
+        const activeAdoptions = adoptionResponse.data.data.filter(
+          (adoption) =>
+            adoption.pet._id === petId &&
+            (adoption.status === "pending" ||
+              adoption.status === "approved" ||
+              adoption.status === "completed")
+        );
+
+        if (activeAdoptions.length > 0) {
+          setIsAdopted(true);
+        }
       } catch (error) {
         console.error("Error fetching pet details:", error);
       }
@@ -34,6 +61,7 @@ export function PetDetailScreen({ route }) {
 
     fetchPetDetail();
   }, [petId]);
+
   // Adopt Pet Button
   const handleAdoptPress = async () => {
     Alert.alert(
@@ -86,6 +114,7 @@ export function PetDetailScreen({ route }) {
                   },
                 }
               );
+              setIsAdopted(true);
 
               Alert.alert(
                 "Success",
@@ -112,7 +141,9 @@ export function PetDetailScreen({ route }) {
       </View>
     );
   }
+
   const isFavorite = favorites.includes(petId);
+
   return (
     <ScrollView style={styles.container}>
       {/* Pet Image */}
@@ -153,7 +184,6 @@ export function PetDetailScreen({ route }) {
           <View style={styles.infoCard}>
             <FontAwesome name="balance-scale" size={24} color="#16A99F" />
             <Text style={styles.infoText}>{pet.size}</Text>
-            {/* Updated from weight to size */}
           </View>
         </View>
       </View>
@@ -170,11 +200,21 @@ export function PetDetailScreen({ route }) {
       </View>
 
       {/* Adopt Button */}
-      <View style={styles.adoptButtonContainer}>
-        <TouchableOpacity onPress={handleAdoptPress} style={styles.adoptButton}>
-          <Text style={styles.adoptButtonText}>Adopt this Pet</Text>
-        </TouchableOpacity>
-      </View>
+      {!isAdopted && (
+        <View style={styles.adoptButtonContainer}>
+          <TouchableOpacity
+            onPress={handleAdoptPress}
+            style={styles.adoptButton}
+          >
+            <Text style={styles.adoptButtonText}>Adopt this Pet</Text>
+          </TouchableOpacity>
+        </View>
+      )}
+      {isAdopted && (
+        <Text style={styles.errorMessage}>
+          This pet is already in an adoption process.
+        </Text>
+      )}
     </ScrollView>
   );
 }
@@ -187,7 +227,7 @@ const styles = StyleSheet.create({
   },
   petImage: {
     width: "100%",
-    height: 300, // Fixed height for better display
+    height: 300,
     borderRadius: 10,
     marginBottom: 20,
   },
@@ -215,7 +255,7 @@ const styles = StyleSheet.create({
   row: {
     flexDirection: "row",
     justifyContent: "space-between",
-    marginBottom: 10, // Add spacing between rows
+    marginBottom: 10,
   },
   infoCard: {
     flexDirection: "column",
@@ -223,7 +263,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#16A99F1A",
     padding: 15,
     borderRadius: 10,
-    width: "48%", // Adjust width to take 2 cards per row
+    width: "48%",
   },
   infoText: {
     marginTop: 5,
@@ -268,16 +308,21 @@ const styles = StyleSheet.create({
   },
   adoptButton: {
     backgroundColor: "#16A99F",
-    borderRadius: 30,
-    paddingVertical: 15,
-    justifyContent: "center",
+    padding: 15,
+    borderRadius: 10,
+    width: "100%",
     alignItems: "center",
     marginBottom: 50,
-    width: "100%",
   },
   adoptButtonText: {
     color: "#fff",
     fontSize: 18,
     fontWeight: "bold",
+  },
+  errorMessage: {
+    color: "red",
+    fontSize: 16,
+    marginTop: 10,
+    textAlign: "center",
   },
 });
