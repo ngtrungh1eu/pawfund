@@ -10,7 +10,7 @@ import {
     Modal,
     TextInput,
 } from 'react-native';
-import { Event } from '../types';
+import { Event, Pet } from '../types';
 
 type EventDetailScreenProps = {
     route: {
@@ -22,17 +22,18 @@ type EventDetailScreenProps = {
 
 const EventDetailScreen = ({ route }: EventDetailScreenProps) => {
     const { event } = route.params;
+    console.log(event.pets);
 
-    // State để quản lý modal và số tiền quyên góp
+    console.log(event.pets.map((pet) => ({ id: pet._id, name: pet.name })));
+
     const [isModalVisible, setModalVisible] = useState(false);
     const [donationAmount, setDonationAmount] = useState('');
 
     const handleDonate = () => {
         console.log('Donate to event:', event.title);
         console.log('Donation Amount:', donationAmount);
-        // Đóng modal sau khi quyên góp
         setModalVisible(false);
-        setDonationAmount(''); // Reset lại số tiền quyên góp
+        setDonationAmount('');
     };
 
     return (
@@ -73,19 +74,21 @@ const EventDetailScreen = ({ route }: EventDetailScreenProps) => {
                     <Text style={styles.subHeader}>Organizer</Text>
                     <Text style={styles.detailText}>
                         <Text style={styles.detailLabel}>Name:</Text>{' '}
-                        {event.organizer.name}
+                        {event.organizer?.name || 'No organizer available'}
                     </Text>
                     <Text style={styles.detailText}>
                         <Text style={styles.detailLabel}>Email:</Text>{' '}
-                        {event.organizer.email}
+                        {event.organizer?.email || 'No organizer available'}
                     </Text>
                     <Text style={styles.detailText}>
                         <Text style={styles.detailLabel}>Phone:</Text>{' '}
-                        {event.organizer.phoneNumber}
+                        {event.organizer?.phoneNumber ||
+                            'No organizer available'}
                     </Text>
                     <Text style={styles.detailText}>
                         <Text style={styles.detailLabel}>Description:</Text>{' '}
-                        {event.organizer.description}
+                        {event.organizer?.description ||
+                            'No organizer available'}
                     </Text>
                 </View>
 
@@ -100,16 +103,44 @@ const EventDetailScreen = ({ route }: EventDetailScreenProps) => {
                         ${event.currentFundAmount}
                     </Text>
                 </View>
+
+                {/* Pets Section */}
+                <View style={styles.petContainer}>
+                    <Text style={styles.subHeader}>
+                        Available Pets for Adoption
+                    </Text>
+                    {event.pets && event.pets.length > 0 ? (
+                        event.pets.map((pet) => (
+                            <View key={pet.id} style={styles.petItem}>
+                                <Image
+                                    source={{ uri: pet.image }}
+                                    style={styles.petImage}
+                                />
+                                <Text style={styles.petName}>{pet.name}</Text>
+                                <Text style={styles.petDetails}>
+                                    Breed: {pet.breed}
+                                </Text>
+                                <Text style={styles.petDetails}>
+                                    Age: {pet.age} years
+                                </Text>
+                            </View>
+                        ))
+                    ) : (
+                        <Text style={styles.noPetsText}>
+                            No pets available for adoption.
+                        </Text>
+                    )}
+                </View>
             </ScrollView>
 
             <TouchableOpacity
                 style={styles.donateButton}
-                onPress={() => setModalVisible(true)} // Mở modal khi nhấn nút Donate
+                onPress={() => setModalVisible(true)}
             >
                 <Text style={styles.donateButtonText}>Donate</Text>
             </TouchableOpacity>
 
-            {/* Modal Quyên Góp */}
+            {/* Donation Modal */}
             <Modal
                 visible={isModalVisible}
                 transparent={true}
@@ -256,6 +287,36 @@ const styles = StyleSheet.create({
     cancelButtonText: {
         color: '#fff',
         fontWeight: 'bold',
+    },
+    petContainer: {
+        marginBottom: 20,
+        padding: 10,
+        backgroundColor: '#f5f5f5',
+        borderRadius: 8,
+    },
+    petItem: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: 15,
+    },
+    petImage: {
+        width: 80,
+        height: 80,
+        borderRadius: 40,
+        marginRight: 10,
+    },
+    petName: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        color: '#333',
+    },
+    petDetails: {
+        fontSize: 14,
+        color: '#555',
+    },
+    noPetsText: {
+        fontSize: 16,
+        color: '#888',
     },
 });
 
