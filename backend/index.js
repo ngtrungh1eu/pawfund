@@ -1,18 +1,54 @@
 const express = require('express');
-const mongoose = require('mongoose');
 const cors = require('cors');
-const petRoutes = require('./routes/petsRoute');
+const dotenv = require('dotenv');
+const path = require('path');
+const methodOverride = require('method-override');
+const cookieParser = require('cookie-parser');
+const morgan = require('morgan');
 
+const authRoutes = require('./routes/authRoute');
+const petRoutes = require('./routes/petsRoute');
+const shelterRoutes = require('./routes/shelterRoutes');
+const adoptionRoutes = require('./routes/adoptionsRoute');
+const donationRoutes = require('./routes/donationsRoute');
+const eventRoutes = require('./routes/eventsRoute');
+const userRoutes = require('./routes/userRoute');
+const { connect } = require('./config/database');
 const app = express();
 
+// Config
+dotenv.config();
+app.use(express.static(path.join(__dirname, 'public')));
+
+// const corsOptions = {
+//     origin: ['http://localhost:3000', 'http://yourdomain.com'],
+//     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+//     credentials: true,
+//     optionsSuccessStatus: 204,
+// };
 app.use(cors());
+app.use(methodOverride('_method'));
+app.use(cookieParser());
+
+// Body parser
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-// Kết nối database
-mongoose.connect('mongodb://localhost:27017/pawfund', { useNewUrlParser: true, useUnifiedTopology: true })
-  .then(() => console.log('Connected to MongoDB'))
-  .catch(err => console.log('Error connecting to MongoDB:', err));
+// Http logger
+app.use(morgan('combined'));
+
+// Connect database
+connect();
+
 // Routes
-app.use('/pets', petRoutes);
-
-module.exports = app;
+app.use('/api/auth', authRoutes);
+app.use('/api/pets', petRoutes);
+app.use('/api/shelters', shelterRoutes);
+app.use('/api/adoptions', adoptionRoutes);
+app.use('/api/donations', donationRoutes);
+app.use('/api/events', eventRoutes);
+app.use('/api/users', userRoutes);
+// Start server
+app.listen(process.env.PORT, () => {
+    console.log(`Server running on port http://localhost:${process.env.PORT}`);
+});
