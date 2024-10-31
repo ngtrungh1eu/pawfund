@@ -1,6 +1,7 @@
 // validators/shelterValidator.js
 const { z } = require('zod');
 const { Types } = require('mongoose');
+const User = require('../models/User');
 
 // Custom validator cho MongoDB ObjectId
 const objectIdSchema = z
@@ -74,6 +75,13 @@ exports.createShelter = async (req, res) => {
     const existingShelter = await Shelter.findOne({ email: validatedData.data.email });
     if (existingShelter) {
       return res.status(400).json({ message: 'Email đã được sử dụng' });
+    }
+
+    if (validatedData.data.staff) {
+      await User.updateMany(
+        { _id: { $in: validatedData.data.staff } },
+        { shelter: validatedData.data._id }
+      );
     }
 
     const shelter = new Shelter(validatedData.data);
@@ -194,6 +202,11 @@ exports.updateShelter = async (req, res) => {
       { ...validatedData.data, updatedAt: Date.now() },
       { new: true, runValidators: true }
     );
+
+    // Cập nhật shelter cho tất cả các user liên quan
+    if (validatedData.data.staff) {
+      await User.updateMany({ _id: { $in: validatedData.data.staff } }, { shelter: shelter._id });
+    }
 
     if (!shelter) {
       return res.status(404).json({ message: 'Không tìm thấy shelter' });

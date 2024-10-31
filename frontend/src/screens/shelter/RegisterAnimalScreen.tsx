@@ -1,23 +1,55 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, ScrollView, Button, StyleSheet, TouchableOpacity, Image } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import {
+  View,
+  Text,
+  TextInput,
+  ScrollView,
+  Button,
+  StyleSheet,
+  TouchableOpacity,
+  Image,
+  Alert,
+} from 'react-native';
 import { launchImageLibrary } from 'react-native-image-picker';
 import { Picker } from '@react-native-picker/picker';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios';
 
 export function RegisterAnimalScreen() {
+  const [shelter, setShelter] = useState(null);
   const [animal, setAnimal] = useState({
     name: '',
     species: 'Dog', // Default selection
     breed: '',
-    age: '',
+    age: 0,
     gender: '',
     size: '',
     color: '',
     description: '',
     medicalHistory: '',
     behavior: '',
-    adoptionStatus: 'Available', // Static value for display only
+    shelter: '',
+    adoptionStatus: 'available', // Static value for display only
     images: [],
   });
+
+  useEffect(() => {
+    fetchProfile();
+  });
+
+  const fetchProfile = async () => {
+    try {
+      const token = await AsyncStorage.getItem('access_token');
+      const response = await axios.get('http://10.0.2.2:8000/api/auth/profile', {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      setShelter(response.data.shelter);
+    } catch (error) {
+      Alert.alert('Error', 'Failed to fetch profile data');
+    }
+  };
 
   const handleInputChange = (key: string, value: string) => {
     setAnimal({
@@ -36,14 +68,33 @@ export function RegisterAnimalScreen() {
       if (!response.didCancel && !response.errorCode && response.assets) {
         setAnimal({
           ...animal,
-          images: [...animal.images, response.assets[0].uri], 
+          images: [...animal.images, response.assets[0].uri],
         });
       }
     });
   };
 
-  const handleSubmit = () => {
-    console.log('Animal data:', animal);
+  const handleSubmit = async () => {
+    console.log(shelter);
+    const validAnimal = {
+      ...animal,
+      shelter: shelter,
+      age: Number(animal.age),
+    };
+
+    axios
+      .post(`${process.env.REACT_NATIVE_API_URL}/pets`, validAnimal, {
+        headers: {
+          Authorization: `Bearer ${await AsyncStorage.getItem('access_token')}`,
+        },
+      })
+      .then((res) => {
+        Alert.alert('Success', 'Animal registered successfully');
+      })
+      .catch((err) => {
+        console.log(err.response);
+        Alert.alert('Error', 'Unable to register animal, please try again later');
+      });
   };
 
   return (
@@ -58,49 +109,46 @@ export function RegisterAnimalScreen() {
         onChangeText={(value) => handleInputChange('name', value)}
       />
 
-<View style={styles.row}>
-  {/* Species Dropdown */}
-  <View style={[styles.pickerContainer, styles.halfInput]}>
-    <Picker
-      selectedValue={animal.species}
-      style={styles.picker}
-      onValueChange={(itemValue) => handleInputChange('species', itemValue)}
-    >
-      <Picker.Item label="Dog" value="Dog" />
-      <Picker.Item label="Cat" value="Cat" />
-      <Picker.Item label="Bird" value="Bird" />
-      <Picker.Item label="Other" value="Other" />
-    </Picker>
-  </View>
+      <View style={styles.row}>
+        {/* Species Dropdown */}
+        <View style={[styles.pickerContainer, styles.halfInput]}>
+          <Picker
+            selectedValue={animal.species}
+            style={styles.picker}
+            onValueChange={(itemValue) => handleInputChange('species', itemValue)}
+          >
+            <Picker.Item label="Dog" value="Dog" />
+            <Picker.Item label="Cat" value="Cat" />
+            <Picker.Item label="Bird" value="Bird" />
+            <Picker.Item label="Other" value="Other" />
+          </Picker>
+        </View>
 
-  {/* Breed */}
-  <TextInput
-    style={[styles.input, styles.halfInput]} // half width style
-    placeholder="Breed"
-    value={animal.breed}
-    onChangeText={(value) => handleInputChange('breed', value)}
-  />
-</View>
+        {/* Breed */}
+        <TextInput
+          style={[styles.input, styles.halfInput]} // half width style
+          placeholder="Breed"
+          value={animal.breed}
+          onChangeText={(value) => handleInputChange('breed', value)}
+        />
+      </View>
 
-
-    
       <View style={styles.row}>
         <TextInput
-          style={[styles.input, styles.halfInput]} 
+          style={[styles.input, styles.halfInput]}
           placeholder="Age"
           value={animal.age}
           keyboardType="numeric"
           onChangeText={(value) => handleInputChange('age', value)}
         />
         <TextInput
-          style={[styles.input, styles.halfInput]} 
+          style={[styles.input, styles.halfInput]}
           placeholder="Gender"
           value={animal.gender}
           onChangeText={(value) => handleInputChange('gender', value)}
         />
       </View>
 
-   
       {/* Size */}
       <TextInput
         style={styles.input}
@@ -161,7 +209,7 @@ export function RegisterAnimalScreen() {
       )}
 
       {/* Submit Button */}
-      <Button title="Register Animal" onPress={handleSubmit} color="#16A99F" />
+      <Button title="Register Animal" onPress={() => handleSubmit()} color="#16A99F" />
     </ScrollView>
   );
 }
@@ -169,7 +217,7 @@ export function RegisterAnimalScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#16A99F1A', 
+    backgroundColor: '#16A99F1A',
     padding: 20,
   },
   title: {

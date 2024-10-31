@@ -43,7 +43,7 @@ export function TabNavigator() {
       {/* Custom SOS Tab */}
       <Tab.Screen
         name="SOS"
-        component={DashboardScreen}
+        component={LostFoundForm}
         options={{
           tabBarIcon: ({ focused }) => (
             <View
